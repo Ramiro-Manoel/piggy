@@ -17,8 +17,6 @@ Clean Architecture. Domain and use cases have no external dependencies. Everythi
 - Go
 - PostgreSQL
 - Pluggy (Open Finance)
-- whatsmeow (WhatsApp)
-- Cobra (CLI)
 
 ## Status
 
