@@ -1,16 +1,12 @@
 # Piggy
 
-Personal finance organizer built in Go. This is a personal project, used both as a real tool for managing my own finances and as a way to practice Go.
+Personal finance organizer built in Go. Personal project for both real use and Go practice.
 
 ## What it does (planned)
 
-- Fetches transaction data through Open Finance, using the Pluggy aggregator.
-- Answers financial questions over WhatsApp.
+- Fetches transaction data through Open Finance (Pluggy).
 - Automatically categorizes transactions using an LLM.
-
-## Architecture
-
-Clean Architecture. Domain and use cases have no external dependencies. Everything else (HTTP, CLI, WhatsApp, Postgres, Pluggy, AI) lives in separate adapters.
+- Answers financial questions over WhatsApp.
 
 ## Stack
 
@@ -20,7 +16,7 @@ Clean Architecture. Domain and use cases have no external dependencies. Everythi
 
 ## Status
 
-Early stage. Currently building the domain models and an in-memory repository, before adding any external infrastructure.
+Phase 1 in progress. Transaction context implemented with in-memory repository. No external infrastructure yet.
 
 ## Running tests
 

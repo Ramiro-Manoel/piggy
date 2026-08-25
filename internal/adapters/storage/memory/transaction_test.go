@@ -1,15 +1,14 @@
-package storage
+package memory
 
 import (
 	"testing"
 	"time"
-
-	"github.com/Ramiro-Manoel/piggy/internal/domain"
+	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
 func TestSaveAndRead(t *testing.T) {
 	repo := NewInMemoryTransactionRepository()
-	transaction := domain.Transaction{
+	transaction := transaction.Transaction{
 		ID:          "1",
 		Description: "Mercado XYZ",
 		Amount:      1050,

@@ -12,41 +12,36 @@ Autor é iniciante em Go — priorizar código idiomático, explicado, sem abstr
 
 Arquitetura
 
-Clean Architecture / Ports & Adapters (Hexagonal).
+Organização por contexto de negócio (idiomático Go).
 
-Regra de dependência: o núcleo (domínio + casos de uso) não importa nenhuma lib externa — nada de net/http, driver de banco, ou SDK de terceiros ali dentro. O núcleo define interfaces ("ports") em internal/usecase/port. Adapters (HTTP, CLI, WhatsApp, Postgres, Pluggy, IA) é que implementam ou consomem essas interfaces. Nunca inverter essa direção.
+Cada contexto (transaction, category, account) é dono do seu domínio, interface de repositório e service. As interfaces são definidas dentro do próprio contexto, no lado do consumidor. Implementações concretas ficam em internal/adapters/.
+
+Regra de dependência: os contextos de negócio não importam nada de adapters. Os adapters importam os contextos para implementar as interfaces. O main.go conecta tudo via injeção de dependência.
 
 SOLID aplicado:
 
-SRP: cada usecase faz uma coisa só (sync não categoriza, categorizar não sincroniza).
-OCP: trocar um adapter (ex: Pluggy por Belvo) não deve exigir mudança nos usecases.
-LSP: qualquer implementação de uma port é substituível por outra sem quebrar o usecase (repo em memória vs Postgres).
-ISP: interfaces pequenas e específicas — nunca uma "mega interface" de repositório.
-DIP: usecases dependem de abstrações que eles mesmos definem, nunca de pacotes concretos.
+SRP: cada service faz operações de um único contexto.
+OCP: trocar um adapter (ex: Pluggy por Belvo) não exige mudança no service.
+LSP: qualquer implementação de Repository é substituível (memória vs Postgres).
+ISP: interfaces pequenas e específicas, definidas pelo consumidor.
+DIP: services dependem de interfaces que eles mesmos definem, nunca de pacotes concretos.
+
 Estrutura de pastas
-meu-organizador/
+piggy/
 ├── cmd/
 │   ├── server/          # main.go: API HTTP + webhook do WhatsApp
 │   └── cli/             # main.go: comandos Cobra
 ├── internal/
-│   ├── domain/          # Transaction, Account, Category, Budget — Go puro
-│   ├── usecase/
-│   │   ├── port/        # interfaces: repository.go, openfinance.go, categorizer.go, messenger.go
-│   │   ├── sync_transactions.go
-│   │   ├── categorize_transactions.go
-│   │   ├── get_summary.go
-│   │   └── answer_question.go
-│   ├── adapter/
-│   │   ├── in/
-│   │   │   ├── http/      # handlers REST
-│   │   │   ├── cli/       # comandos que chamam os usecases
-│   │   │   └── whatsapp/  # webhook / listener
-│   │   └── out/
-│   │       ├── postgres/  # implementa port.TransactionRepository
-│   │       ├── pluggy/    # implementa port.OpenFinanceProvider
-│   │       ├── ai/        # implementa port.Categorizer
-│   │       └── whatsapp/  # implementa port.Messenger
-│   └── config/
+│   ├── transaction/     # Transaction, Repository, Service
+│   ├── category/        # Category, Repository, Categorizer, Service
+│   ├── account/         # Account, Repository, Service
+│   └── adapters/
+│       ├── storage/
+│       │   ├── memory/  # implementações em memória
+│       │   └── postgres/
+│       ├── pluggy/      # implementa FinanceProvider
+│       ├── ai/          # implementa Categorizer
+│       └── whatsapp/    # bot whatsmeow
 ├── migrations/
 └── go.mod
 Stack escolhida
@@ -71,4 +66,4 @@ CLI
 Bot de WhatsApp
 Status atual
 
-Nenhum código escrito ainda. Começando pela Fase 1.
+Fase 1 em andamento. Contexto transaction implementado com struct, interface Repository e Service básico (Save, List). Implementação em memória em adapters/storage/memory. Sem infraestrutura externa ainda.
