@@ -15,3 +15,7 @@ func (s *Service) Save(t Transaction) error {
 func (s *Service) List() []Transaction {
 	return s.repo.List()
 }
+
+func (s *Service) Read(id string) (Transaction, error) {
+	return s.repo.Read(id)
+}

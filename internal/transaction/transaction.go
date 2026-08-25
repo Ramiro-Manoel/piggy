@@ -7,4 +7,5 @@ type Transaction struct {
 	Description string
 	Amount      int64
 	Date        time.Time
+	CategoryID *String
 }
