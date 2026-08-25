@@ -7,7 +7,7 @@ import (
 )
 
 func TestSaveAndRead(t *testing.T) {
-	repo := NewInMemoryTransactionRepository()
+	repo := NewTransactionRepository()
 	transaction := transaction.Transaction{
 		ID:          "1",
 		Description: "Mercado XYZ",
@@ -31,7 +31,7 @@ func TestSaveAndRead(t *testing.T) {
 }
 
 func TestReadNotFound(t *testing.T) {
-	repo := NewInMemoryTransactionRepository()
+	repo := NewTransactionRepository()
 
 	_, err := repo.Read("non existing ID")
 
