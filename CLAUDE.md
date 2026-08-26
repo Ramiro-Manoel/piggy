@@ -66,4 +66,14 @@ CLI
 Bot de WhatsApp
 Status atual
 
-Fase 1 em andamento. Contexto transaction implementado com struct, interface Repository e Service básico (Save, List). Implementação em memória em adapters/storage/memory. Sem infraestrutura externa ainda.
+Fase 1 em andamento. Próximo passo: implementar internal/http/handler.go com as rotas HTTP e criar cmd/server/main.go conectando as dependências.
+
+Contextos implementados:
+- transaction: struct Transaction (com CategoryID *string), interface Repository, Service (Save, List, Read). Implementação em memória em adapters/storage/memory.
+- category: struct Category (com ParentID *string, suporta um nível de subcategoria), interface Repository, Service (Create, List). Implementação em memória em adapters/storage/memory.
+
+Pendente:
+- internal/http/handler.go — rotas GET /transactions, POST /transactions, GET /categories
+- cmd/server/main.go — injeção de dependências e subida do servidor
+- transaction.Service: método CategorizeManual e interface FinanceProvider (para Sync via Pluggy)
+- Testes do service (bloqueado por política de AV corporativo — aguardando TI liberar C:\SAPDevelop)
