@@ -2,7 +2,7 @@
 *.exe
 piggy
 cli
-server
+/cmd/server/server
 
 .env
 .env.local

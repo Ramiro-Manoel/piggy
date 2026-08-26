@@ -20,10 +20,11 @@ func NewHandler(transactionSvc transactionService, categorySvc categoryService) 
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /transactions", h.saveTransaction)
+	mux.HandleFunc("GET /transactions", h.listTransactions)
+	mux.HandleFunc("POST /transactions", h.createTransaction)
 }
 
-func (h *Handler) saveTransaction(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) createTransaction(w http.ResponseWriter, r *http.Request) {
 	var t transaction.Transaction
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
@@ -38,4 +39,11 @@ func (h *Handler) saveTransaction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (h *Handler) listTransactions(w http.ResponseWriter, r *http.Request) {
+
+	transactions := h.transactionSvc.List()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(transactions)
 }
