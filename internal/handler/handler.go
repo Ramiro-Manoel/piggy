@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/Ramiro-Manoel/piggy/internal/category"
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
@@ -22,6 +23,9 @@ func NewHandler(transactionSvc transactionService, categorySvc categoryService) 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /transactions", h.listTransactions)
 	mux.HandleFunc("POST /transactions", h.createTransaction)
+
+	mux.HandleFunc("GET /categories", h.listCategories)
+	mux.HandleFunc("POST /categories", h.createCategory)
 }
 
 func (h *Handler) createTransaction(w http.ResponseWriter, r *http.Request) {
@@ -46,4 +50,28 @@ func (h *Handler) listTransactions(w http.ResponseWriter, r *http.Request) {
 	transactions := h.transactionSvc.List()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(transactions)
+}
+
+func (h *Handler) createCategory(w http.ResponseWriter, r *http.Request) {
+	var c category.Category
+	err := json.NewDecoder(r.Body).Decode(&c)
+	if err != nil {
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	err = h.categorySvc.Create(c)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
+
+func (h *Handler) listCategories(w http.ResponseWriter, r *http.Request) {
+
+	categories := h.categorySvc.List()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(categories)
 }
