@@ -6,13 +6,13 @@ import (
 )
 
 type transactionService interface {
-	Save(transaction.Transaction) error
+	Create(transaction.Transaction) error
 	Read(string) (transaction.Transaction, error)
 	List() []transaction.Transaction
 }
 
 type categoryService interface {
-	Save(category.Category) error
+	Create(category.Category) error
 	Read(string) (category.Category, error)
 	List() []category.Category
 }

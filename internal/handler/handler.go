@@ -31,7 +31,7 @@ func (h *Handler) saveTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.transactionSvc.Save(t)
+	err = h.transactionSvc.Create(t)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
