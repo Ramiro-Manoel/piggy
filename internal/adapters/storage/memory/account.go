@@ -25,7 +25,7 @@ func (r *AccountRepository) Read(id string) (account.Account, error) {
 			return r.accounts[i], nil
 		}
 	}
-	return account.Account{}, fmt.Errorf("category with id %s not found", id)
+	return account.Account{}, fmt.Errorf("account with id %s not found", id)
 }
 
 func (r *AccountRepository) List() []account.Account {

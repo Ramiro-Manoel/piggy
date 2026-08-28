@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/Ramiro-Manoel/piggy/internal/account"
 	"github.com/Ramiro-Manoel/piggy/internal/category"
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
@@ -11,12 +12,14 @@ import (
 type Handler struct {
 	transactionSvc transactionService
 	categorySvc    categoryService
+	accountSvc     accountService
 }
 
-func NewHandler(transactionSvc transactionService, categorySvc categoryService) *Handler {
+func NewHandler(transactionSvc transactionService, categorySvc categoryService, accountSvc accountService) *Handler {
 	return &Handler{
 		transactionSvc: transactionSvc,
 		categorySvc:    categorySvc,
+		accountSvc:     accountSvc,
 	}
 }
 
@@ -26,6 +29,9 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 
 	mux.HandleFunc("GET /categories", h.listCategories)
 	mux.HandleFunc("POST /categories", h.createCategory)
+
+	mux.HandleFunc("GET /accounts", h.listAccounts)
+	mux.HandleFunc("POST /accounts", h.createAccount)
 }
 
 func (h *Handler) createTransaction(w http.ResponseWriter, r *http.Request) {
@@ -74,4 +80,28 @@ func (h *Handler) listCategories(w http.ResponseWriter, r *http.Request) {
 	categories := h.categorySvc.List()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(categories)
+}
+
+func (h *Handler) createAccount(w http.ResponseWriter, r *http.Request) {
+	var a account.Account
+	err := json.NewDecoder(r.Body).Decode(&a)
+	if err != nil {
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	err = h.accountSvc.Create(a)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
+
+func (h *Handler) listAccounts(w http.ResponseWriter, r *http.Request) {
+
+	accounts := h.accountSvc.List()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(accounts)
 }
