@@ -5,5 +5,5 @@ type Account struct {
 	Number  string
 	Name    string
 	Owner   string
-	Balance int
+	Balance int64
 }
