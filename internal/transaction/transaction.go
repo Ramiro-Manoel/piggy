@@ -8,4 +8,5 @@ type Transaction struct {
 	Amount      int64
 	Date        time.Time
 	CategoryID  *string
+	AccountID   string
 }

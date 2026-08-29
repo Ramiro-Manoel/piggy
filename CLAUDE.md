@@ -32,22 +32,25 @@ piggy/
 │   ├── server/          # main.go: API HTTP + webhook do WhatsApp
 │   └── cli/             # main.go: comandos Cobra
 ├── internal/
-│   ├── transaction/     # Transaction, Repository, Service
-│   ├── category/        # Category, Repository, Categorizer, Service
-│   ├── account/         # Account, Repository, Service
+│   ├── transaction/     # Transaction (Amount int64 centavos, CategoryID *string, AccountID *string), Repository, Service
+│   ├── category/        # Category (ParentID *string, suporta um nível de subcategoria), Repository, Service
+│   ├── account/         # Account (ID, Number, Name, Owner, Balance int64 centavos), Repository, Service
 │   └── adapters/
 │       ├── storage/
-│       │   ├── memory/  # implementações em memória
-│       │   └── postgres/
+│       │   ├── memory/  # implementações em memória (transaction, category, account)
+│       │   └── postgres/ # implementações Postgres — pgx/v5 (account implementado)
 │       ├── pluggy/      # implementa FinanceProvider
 │       ├── ai/          # implementa Categorizer
 │       └── whatsapp/    # bot whatsmeow
-├── migrations/
+├── migrations/          # golang-migrate, up/down SQL por contexto
+│   ├── 001_create_accounts.up.sql / down.sql
+│   ├── 002_create_categories.up.sql / down.sql
+│   └── 003_create_transactions.up.sql / down.sql
 └── go.mod
 Stack escolhida
 Open Finance: Pluggy, via fluxo "Meu Pluggy" (gratuito e sem prazo de expiração para uso pessoal, desde que as contas conectadas sejam do próprio usuário). Sem SDK oficial em Go — consumir a API REST direto via net/http.
 WhatsApp: whatsmeow (go.mau.fi/whatsmeow) — não oficial, protocolo WhatsApp Web multidevice, ainda pré-1.0. Fixar versão exata no go.mod.
-Banco: PostgreSQL + pgx ou sqlc.
+Banco: PostgreSQL (Neon — cloud gratuito) + pgx/v5. Migrations via golang-migrate.
 CLI: cobra.
 HTTP: net/http da stdlib pra começar; migrar pra chi só se precisar de mais middleware.
 Categorização: chamada a uma API de LLM pedindo categoria estruturada (JSON) a partir da descrição/estabelecimento da transação.
@@ -56,6 +59,9 @@ Erros explícitos sempre (if err != nil), nunca engolir silenciosamente; empacot
 Sem variáveis globais mutáveis; dependências entram via injeção no construtor (New...).
 Cada usecase precisa de teste unitário usando fakes manuais das ports (interfaces pequenas tornam isso fácil, sem precisar de framework de mock).
 Comentários estilo godoc em identificadores exportados.
+Valores monetários sempre em centavos (int64) — nunca float.
+Conexão com o banco criada no main.go e injetada nos repositórios via construtor.
+Variáveis de ambiente carregadas via godotenv (.env local, .env.example commitado sem valores).
 Roadmap (ordem de construção — não pular fases)
 Domínio + casos de uso com repositório em memória (sem infra externa ainda)
 Persistência real em Postgres
@@ -66,14 +72,21 @@ CLI
 Bot de WhatsApp
 Status atual
 
-Fase 1 em andamento. Próximo passo: implementar internal/http/handler.go com as rotas HTTP e criar cmd/server/main.go conectando as dependências.
+Fase 1 concluída. Fase 2 (Postgres) em andamento.
 
 Contextos implementados:
-- transaction: struct Transaction (com CategoryID *string), interface Repository, Service (Save, List, Read). Implementação em memória em adapters/storage/memory.
-- category: struct Category (com ParentID *string, suporta um nível de subcategoria), interface Repository, Service (Create, List). Implementação em memória em adapters/storage/memory.
+- transaction: struct Transaction (Amount int64, CategoryID *string), interface Repository, Service (Create, List, Read). Implementação em memória.
+- category: struct Category (ParentID *string), interface Repository, Service (Create, List, Read). Implementação em memória.
+- account: struct Account (Balance int64), interface Repository, Service (Create, List, Read). Implementação em memória E Postgres (pgx/v5).
+- handler: Handler com rotas GET/POST para /transactions, /categories e /accounts. Interfaces locais por contexto em interfaces.go.
+- cmd/server/main.go: injeção de dependências, conexão Postgres via pgx, carregamento de .env via godotenv.
 
-Pendente:
-- internal/http/handler.go — rotas GET /transactions, POST /transactions, GET /categories
-- cmd/server/main.go — injeção de dependências e subida do servidor
-- transaction.Service: método CategorizeManual e interface FinanceProvider (para Sync via Pluggy)
+Pendente (Fase 2):
+- postgres/transaction.go e postgres/category.go — adapters Postgres para transaction e category
+- transaction.Transaction: adicionar campo AccountID string
 - Testes do service (bloqueado por política de AV corporativo — aguardando TI liberar C:\SAPDevelop)
+
+Pendente (fases futuras):
+- transaction.Service: método CategorizeManual e interface FinanceProvider (para Sync via Pluggy)
+- Contexto card (cartão de crédito separado de conta)
+- cmd/cli/ — Cobra CLI
