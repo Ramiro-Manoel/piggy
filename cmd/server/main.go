@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/Ramiro-Manoel/piggy/internal/account"
-	"github.com/Ramiro-Manoel/piggy/internal/adapters/storage/memory"
 	"github.com/Ramiro-Manoel/piggy/internal/adapters/storage/postgres"
 	"github.com/Ramiro-Manoel/piggy/internal/category"
 	"github.com/Ramiro-Manoel/piggy/internal/handler"
@@ -25,8 +24,8 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	transactionRepo := memory.NewTransactionRepository()
-	categoryRepo := memory.NewCategoryRepository()
+	transactionRepo := postgres.NewTransactionRepository(conn)
+	categoryRepo := postgres.NewCategoryRepository(conn)
 	accountRepo := postgres.NewAccountRepository(conn)
 
 	transactionSvc := transaction.NewService(transactionRepo)
