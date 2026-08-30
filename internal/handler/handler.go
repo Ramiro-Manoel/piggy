@@ -34,11 +34,24 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /accounts", h.createAccount)
 }
 
-func (h *Handler) createTransaction(w http.ResponseWriter, r *http.Request) {
-	var t transaction.Transaction
-	err := json.NewDecoder(r.Body).Decode(&t)
+func decode[T any](w http.ResponseWriter, r *http.Request) (T, error) {
+	var v T
+	err := json.NewDecoder(r.Body).Decode(&v)
 	if err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return v, err
+	}
+	return v, nil
+}
+
+func writeJSON(w http.ResponseWriter, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(v)
+}
+
+func (h *Handler) createTransaction(w http.ResponseWriter, r *http.Request) {
+	t, err := decode[transaction.Transaction](w, r)
+	if err != nil {
 		return
 	}
 
@@ -52,17 +65,12 @@ func (h *Handler) createTransaction(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) listTransactions(w http.ResponseWriter, r *http.Request) {
-
-	transactions := h.transactionSvc.List()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(transactions)
+	writeJSON(w, h.transactionSvc.List())
 }
 
 func (h *Handler) createCategory(w http.ResponseWriter, r *http.Request) {
-	var c category.Category
-	err := json.NewDecoder(r.Body).Decode(&c)
+	c, err := decode[category.Category](w, r)
 	if err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
@@ -76,17 +84,12 @@ func (h *Handler) createCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) listCategories(w http.ResponseWriter, r *http.Request) {
-
-	categories := h.categorySvc.List()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(categories)
+	writeJSON(w, h.categorySvc.List())
 }
 
 func (h *Handler) createAccount(w http.ResponseWriter, r *http.Request) {
-	var a account.Account
-	err := json.NewDecoder(r.Body).Decode(&a)
+	a, err := decode[account.Account](w, r)
 	if err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
@@ -100,8 +103,5 @@ func (h *Handler) createAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) listAccounts(w http.ResponseWriter, r *http.Request) {
-
-	accounts := h.accountSvc.List()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(accounts)
+	writeJSON(w, h.accountSvc.List())
 }
