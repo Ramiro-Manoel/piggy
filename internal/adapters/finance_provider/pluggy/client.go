@@ -55,6 +55,25 @@ func (c *client) Authenticate() error {
 	return nil
 }
 
+func (c *client) do(req *http.Request) (*http.Response, error) {
+	req.Header.Set("X-API-KEY", c.apiKey)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		resp.Body.Close()
+		err = c.Authenticate()
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("X-API-KEY", c.apiKey)
+		return http.DefaultClient.Do(req)
+	}
+	return resp, nil
+}
+
 func (c *client) FetchTransactions(accountID string) ([]transaction.Transaction, error) {
 	url := baseURL + "/v2/transactions?accountId=" + accountID
 
@@ -62,9 +81,8 @@ func (c *client) FetchTransactions(accountID string) ([]transaction.Transaction,
 	if err != nil {
 		return []transaction.Transaction{}, err
 	}
-	req.Header.Set("X-API-KEY", c.apiKey)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return []transaction.Transaction{}, err
 	}

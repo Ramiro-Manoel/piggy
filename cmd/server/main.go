@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Ramiro-Manoel/piggy/internal/account"
+	"github.com/Ramiro-Manoel/piggy/internal/adapters/finance_provider/pluggy"
 	"github.com/Ramiro-Manoel/piggy/internal/adapters/storage/postgres"
 	"github.com/Ramiro-Manoel/piggy/internal/category"
 	"github.com/Ramiro-Manoel/piggy/internal/handler"
@@ -28,7 +29,10 @@ func main() {
 	categoryRepo := postgres.NewCategoryRepository(conn)
 	accountRepo := postgres.NewAccountRepository(conn)
 
-	transactionSvc := transaction.NewService(transactionRepo)
+	financeProvider := pluggy.NewClient(os.Getenv("PLUGGY_CLIENT_ID"), os.Getenv("PLUGGY_CLIENT_SECRET"))
+	financeProvider.Authenticate()
+
+	transactionSvc := transaction.NewService(transactionRepo, financeProvider)
 	categorySvc := category.NewService(categoryRepo)
 	accountSvc := account.NewService(accountRepo)
 
