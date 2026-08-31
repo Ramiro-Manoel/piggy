@@ -5,18 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
 const baseURL = "https://api.pluggy.ai"
 
-type authRequest struct {
-	ClientId     string `json:"clientId"`
-	ClientSecret string `json:"clientSecret"`
-}
-
-type authResponse struct {
-	ApiKey string `json:"apiKey"`
-}
 type client struct {
 	clientID     string
 	clientSecret string
@@ -30,12 +24,14 @@ func NewClient(clientID, clientSecret string) *client {
 }
 
 func (c *client) Authenticate() error {
+	url := baseURL + "/auth"
+
 	body, err := json.Marshal(authRequest{ClientId: c.clientID, ClientSecret: c.clientSecret})
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", baseURL+"/auth", bytes.NewReader(body))
+	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
@@ -57,4 +53,36 @@ func (c *client) Authenticate() error {
 	}
 	c.apiKey = authResp.ApiKey
 	return nil
+}
+
+func (c *client) FetchTransactions(accountID string) ([]transaction.Transaction, error) {
+	url := baseURL + "/v2/transactions?accountId=" + accountID
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []transaction.Transaction{}, err
+	}
+	req.Header.Set("X-API-KEY", c.apiKey)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return []transaction.Transaction{}, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return []transaction.Transaction{},
+			fmt.Errorf("pluggy fetch trasactions failed: status %d", resp.StatusCode)
+	}
+
+	var transactionsResp transactionsResponse
+	err = json.NewDecoder(resp.Body).Decode(&transactionsResp)
+	if err != nil {
+		return []transaction.Transaction{}, err
+	}
+	transactions, err := toTransactions(transactionsResp.Results)
+	if err != nil {
+		return []transaction.Transaction{}, err
+	}
+
+	return transactions, nil
 }
