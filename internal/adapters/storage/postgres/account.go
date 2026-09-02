@@ -17,7 +17,7 @@ func NewAccountRepository(db *pgx.Conn) *accountRepository {
 
 func (r *accountRepository) scan(row pgx.Row) (account.Account, error) {
 	var a account.Account
-	err := row.Scan(&a.ID, &a.Name, &a.Number, &a.Owner, &a.Balance)
+	err := row.Scan(&a.ID, &a.Ref.ExternalID, &a.Ref.Source, &a.Name, &a.Number, &a.Owner, &a.Balance)
 	if err != nil {
 		return account.Account{}, err
 	}
@@ -26,16 +26,16 @@ func (r *accountRepository) scan(row pgx.Row) (account.Account, error) {
 }
 func (r *accountRepository) Save(a account.Account) error {
 	_, err := r.db.Exec(context.Background(), `
-		INSERT INTO accounts (id, name, number, owner, balance)
-		VALUES ($1, $2, $3, $4, $5)
-	`, a.ID, a.Name, a.Number, a.Owner, a.Balance)
+		INSERT INTO accounts (id, external_id, source, name, number, owner, balance)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`, a.ID, a.Ref.ExternalID, a.Ref.Source, a.Name, a.Number, a.Owner, a.Balance)
 
 	return err
 }
 
 func (r *accountRepository) Read(id string) (account.Account, error) {
 	row := r.db.QueryRow(context.Background(), `
-	SELECT * FROM accounts 
+	SELECT id, external_id, source, name, number, owner, balance FROM accounts 
 		WHERE id = $1
 	`, id)
 
@@ -48,7 +48,8 @@ func (r *accountRepository) Read(id string) (account.Account, error) {
 
 func (r *accountRepository) List() []account.Account {
 	rows, err := r.db.Query(context.Background(), `
-	SELECT * FROM accounts 
+	SELECT id, external_id, source, name, number, owner, balance 
+		FROM accounts 
 	`)
 	if err != nil {
 		return []account.Account{}

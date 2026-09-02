@@ -45,7 +45,7 @@ func toAccount(pa pluggyAccount) (account.Account, error) {
 			Source:     source},
 		Number:  pa.Number,
 		Name:    pa.Name,
-		Balance: int64(math.Round(pa.Blance * 100)),
+		Balance: int64(math.Round(pa.Balance * 100)),
 		Owner:   pa.Owner,
 	}, nil
 }

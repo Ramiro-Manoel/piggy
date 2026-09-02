@@ -103,8 +103,8 @@ func (c *client) FetchTransactions(accountID string) ([]transaction.Transaction,
 	return toTransactions(transactionsResp.Results)
 }
 
-func (c *client) FetchAccounts(institutionID string) ([]account.Account, error) {
-	url := baseURL + "accounts"
+func (c *client) FetchAccounts(itemID string) ([]account.Account, error) {
+	url := baseURL + "/accounts" + "?itemId=" + itemID
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

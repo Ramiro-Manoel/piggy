@@ -26,9 +26,9 @@ type accountsResponse struct {
 }
 
 type pluggyAccount struct {
-	ID     string  `json:"id"`
-	Number string  `json:"number"`
-	Name   string  `json:"name"`
-	Blance float64 `json:"balance"`
-	Owner  string  `json:"owner"`
+	ID      string  `json:"id"`
+	Number  string  `json:"number"`
+	Name    string  `json:"name"`
+	Balance float64 `json:"balance"`
+	Owner   string  `json:"owner"`
 }
