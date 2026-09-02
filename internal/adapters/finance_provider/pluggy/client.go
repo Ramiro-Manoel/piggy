@@ -10,6 +10,7 @@ import (
 )
 
 const baseURL = "https://api.pluggy.ai"
+const source = "pluggy"
 
 type client struct {
 	clientID     string

@@ -4,7 +4,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/Ramiro-Manoel/piggy/internal/provider"
+	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
@@ -15,9 +15,9 @@ func toTransaction(pt pluggyTransaction) (transaction.Transaction, error) {
 	}
 
 	return transaction.Transaction{
-		Ref: provider.Ref{
+		Ref: external.Reference{
 			ExternalID: pt.ID,
-			Source:     provider.SourcePluggy},
+			Source:     source},
 		Description: pt.Description,
 		Date:        date,
 		Amount:      int64(math.Round(pt.Amount * 100)),
