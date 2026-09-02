@@ -20,3 +20,15 @@ type pluggyTransaction struct {
 	Date        string  `json:"date"`
 	AccountID   string  `json:"accountId"`
 }
+
+type accountsResponse struct {
+	Results []pluggyAccount `json:"results"`
+}
+
+type pluggyAccount struct {
+	ID     string  `json:"id"`
+	Number string  `json:"number"`
+	Name   string  `json:"name"`
+	Blance float64 `json:"balance"`
+	Owner  string  `json:"owner"`
+}

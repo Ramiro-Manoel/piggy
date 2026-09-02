@@ -4,6 +4,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/Ramiro-Manoel/piggy/internal/account"
 	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
@@ -35,4 +36,28 @@ func toTransactions(pts []pluggyTransaction) ([]transaction.Transaction, error) 
 		transactions = append(transactions, t)
 	}
 	return transactions, nil
+}
+
+func toAccount(pa pluggyAccount) (account.Account, error) {
+	return account.Account{
+		Ref: external.Reference{
+			ExternalID: pa.ID,
+			Source:     source},
+		Number:  pa.Number,
+		Name:    pa.Name,
+		Balance: int64(math.Round(pa.Blance * 100)),
+		Owner:   pa.Owner,
+	}, nil
+}
+
+func toAccounts(pas []pluggyAccount) ([]account.Account, error) {
+	var accounts []account.Account
+	for _, pa := range pas {
+		a, err := toAccount(pa)
+		if err != nil {
+			return []account.Account{}, err
+		}
+		accounts = append(accounts, a)
+	}
+	return accounts, nil
 }

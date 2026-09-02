@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Ramiro-Manoel/piggy/internal/account"
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
@@ -98,10 +99,32 @@ func (c *client) FetchTransactions(accountID string) ([]transaction.Transaction,
 	if err != nil {
 		return []transaction.Transaction{}, err
 	}
-	transactions, err := toTransactions(transactionsResp.Results)
+
+	return toTransactions(transactionsResp.Results)
+}
+
+func (c *client) FetchAccounts(institutionID string) ([]account.Account, error) {
+	url := baseURL + "accounts"
+
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return []transaction.Transaction{}, err
+		return []account.Account{}, err
 	}
 
-	return transactions, nil
+	resp, err := c.do(req)
+	if err != nil {
+		return []account.Account{}, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return []account.Account{},
+			fmt.Errorf("pluggy fetch accounts failed: status %d", resp.StatusCode)
+	}
+
+	var accountsResp accountsResponse
+	err = json.NewDecoder(resp.Body).Decode(&accountsResp)
+	if err != nil {
+		return []account.Account{}, err
+	}
+	return toAccounts(accountsResp.Results)
 }
