@@ -1,7 +1,7 @@
 CREATE TABLE transactions (
     id           TEXT PRIMARY KEY,
-	external_id	 TEXT ,
-	source 		 TEXT NOT NULL,
+	external_id	 TEXT,
+	source 		 TEXT,
     description  TEXT NOT NULL,
 	amount       BIGINT NOT NULL DEFAULT 0,
 	date         TIMESTAMPTZ NOT NULL,
