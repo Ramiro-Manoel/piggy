@@ -26,12 +26,14 @@ func NewHandler(transactionSvc transactionService, categorySvc categoryService, 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /transactions", h.listTransactions)
 	mux.HandleFunc("POST /transactions", h.createTransaction)
+	mux.HandleFunc("POST /transactions/sync/{accountID}", h.syncTransactions)
 
 	mux.HandleFunc("GET /categories", h.listCategories)
 	mux.HandleFunc("POST /categories", h.createCategory)
 
 	mux.HandleFunc("GET /accounts", h.listAccounts)
 	mux.HandleFunc("POST /accounts", h.createAccount)
+	mux.HandleFunc("POST /accounts/sync/{institutionID}", h.syncAccounts)
 }
 
 func decode[T any](w http.ResponseWriter, r *http.Request) (T, error) {
@@ -66,6 +68,17 @@ func (h *Handler) createTransaction(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) listTransactions(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, h.transactionSvc.List())
+}
+
+func (h *Handler) syncTransactions(w http.ResponseWriter, r *http.Request) {
+	accountID := r.PathValue("accountID")
+
+	err := h.transactionSvc.Sync(accountID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *Handler) createCategory(w http.ResponseWriter, r *http.Request) {
@@ -104,4 +117,15 @@ func (h *Handler) createAccount(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) listAccounts(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, h.accountSvc.List())
+}
+
+func (h *Handler) syncAccounts(w http.ResponseWriter, r *http.Request) {
+	institutionID := r.PathValue("institutionID")
+
+	err := h.accountSvc.Sync(institutionID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }

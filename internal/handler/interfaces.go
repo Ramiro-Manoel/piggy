@@ -10,6 +10,7 @@ type transactionService interface {
 	Create(transaction.Transaction) error
 	Read(string) (transaction.Transaction, error)
 	List() []transaction.Transaction
+	Sync(string) error
 }
 
 type categoryService interface {
@@ -22,4 +23,5 @@ type accountService interface {
 	Create(account.Account) error
 	Read(string) (account.Account, error)
 	List() []account.Account
+	Sync(string) error
 }

@@ -35,7 +35,7 @@ func (r *categoryRepository) Save(c category.Category) error {
 
 func (r *categoryRepository) Read(id string) (category.Category, error) {
 	row := r.db.QueryRow(context.Background(), `
-	SELECT * FROM categories 
+	SELECT id, name, parent_id FROM categories 
 		WHERE id = $1
 	`, id)
 
@@ -49,11 +49,12 @@ func (r *categoryRepository) Read(id string) (category.Category, error) {
 
 func (r *categoryRepository) List() []category.Category {
 	rows, err := r.db.Query(context.Background(), `
-	SELECT * FROM categories
+	SELECT id, name, parent_id FROM categories
 	`)
 	if err != nil {
 		return []category.Category{}
 	}
+	defer rows.Close()
 
 	var categories []category.Category
 	for rows.Next() {

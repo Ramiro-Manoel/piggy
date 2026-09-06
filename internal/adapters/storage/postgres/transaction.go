@@ -63,6 +63,7 @@ func (r *transactionRepository) List() []transaction.Transaction {
 	if err != nil {
 		return []transaction.Transaction{}
 	}
+	defer rows.Close()
 
 	var transactions []transaction.Transaction
 	for rows.Next() {
