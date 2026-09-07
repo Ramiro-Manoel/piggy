@@ -30,13 +30,16 @@ func main() {
 	accountRepo := postgres.NewAccountRepository(conn)
 
 	financeProvider := pluggy.NewClient(os.Getenv("PLUGGY_CLIENT_ID"), os.Getenv("PLUGGY_CLIENT_SECRET"))
-	financeProvider.Authenticate()
+	err = financeProvider.Authenticate()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	transactionSvc := transaction.NewService(transactionRepo, financeProvider)
 	categorySvc := category.NewService(categoryRepo)
-	accountSvc := account.NewService(accountRepo)
+	accountSvc := account.NewService(accountRepo, financeProvider)
 
-	handler := handler.NewHandler(transactionSvc, categorySvc, accountSvc)
+	handler := handler.NewHandler(transactionSvc, categorySvc, accountSvc, os.Getenv("PLUGGY_INSTITUTION_ID"))
 
 	mux := http.NewServeMux()
 	handler.RegisterRoutes(mux)

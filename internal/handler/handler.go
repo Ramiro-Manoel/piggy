@@ -13,13 +13,15 @@ type Handler struct {
 	transactionSvc transactionService
 	categorySvc    categoryService
 	accountSvc     accountService
+	institutionID  string
 }
 
-func NewHandler(transactionSvc transactionService, categorySvc categoryService, accountSvc accountService) *Handler {
+func NewHandler(transactionSvc transactionService, categorySvc categoryService, accountSvc accountService, institutionID string) *Handler {
 	return &Handler{
 		transactionSvc: transactionSvc,
 		categorySvc:    categorySvc,
 		accountSvc:     accountSvc,
+		institutionID:  institutionID,
 	}
 }
 
@@ -33,7 +35,7 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 
 	mux.HandleFunc("GET /accounts", h.listAccounts)
 	mux.HandleFunc("POST /accounts", h.createAccount)
-	mux.HandleFunc("POST /accounts/sync/{institutionID}", h.syncAccounts)
+	mux.HandleFunc("POST /accounts/sync", h.syncAccounts)
 }
 
 func decode[T any](w http.ResponseWriter, r *http.Request) (T, error) {
@@ -120,9 +122,7 @@ func (h *Handler) listAccounts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) syncAccounts(w http.ResponseWriter, r *http.Request) {
-	institutionID := r.PathValue("institutionID")
-
-	err := h.accountSvc.Sync(institutionID)
+	err := h.accountSvc.Sync(h.institutionID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
