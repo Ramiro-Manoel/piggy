@@ -15,8 +15,8 @@ func NewTransactionRepository(db *pgx.Conn) *transactionRepository {
 	return &transactionRepository{db: db}
 }
 
-func (r *transactionRepository) scan(row pgx.Row) (transaction.Transaction, error) {
-	var t transaction.Transaction
+func (r *transactionRepository) scan(row pgx.Row) (transaction.AccountTransaction, error) {
+	var t transaction.AccountTransaction
 	err := row.Scan(
 		&t.ID,
 		&t.Ref.ExternalID,
@@ -27,12 +27,12 @@ func (r *transactionRepository) scan(row pgx.Row) (transaction.Transaction, erro
 		&t.CategoryID,
 		&t.AccountID)
 	if err != nil {
-		return transaction.Transaction{}, err
+		return transaction.AccountTransaction{}, err
 	}
 	return t, nil
 }
 
-func (r *transactionRepository) Save(t transaction.Transaction) error {
+func (r *transactionRepository) Save(t transaction.AccountTransaction) error {
 	_, err := r.db.Exec(context.Background(), `
 		INSERT INTO transactions (id, external_id, source, description, amount, date, category_id, account_id)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -42,7 +42,7 @@ func (r *transactionRepository) Save(t transaction.Transaction) error {
 	return err
 }
 
-func (r *transactionRepository) Read(id string) (transaction.Transaction, error) {
+func (r *transactionRepository) Read(id string) (transaction.AccountTransaction, error) {
 	row := r.db.QueryRow(context.Background(), `
 	SELECT id, external_id, source, description, amount, date, category_id, account_id
 	FROM transactions
@@ -51,25 +51,25 @@ func (r *transactionRepository) Read(id string) (transaction.Transaction, error)
 
 	t, err := r.scan(row)
 	if err != nil {
-		return transaction.Transaction{}, err
+		return transaction.AccountTransaction{}, err
 	}
 	return t, nil
 }
-func (r *transactionRepository) List() []transaction.Transaction {
+func (r *transactionRepository) List() []transaction.AccountTransaction {
 	rows, err := r.db.Query(context.Background(), `
 	SELECT id, external_id, source, description, amount, date, category_id, account_id
 	FROM transactions
 	`)
 	if err != nil {
-		return []transaction.Transaction{}
+		return []transaction.AccountTransaction{}
 	}
 	defer rows.Close()
 
-	var transactions []transaction.Transaction
+	var transactions []transaction.AccountTransaction
 	for rows.Next() {
 		t, err := r.scan(rows)
 		if err != nil {
-			return []transaction.Transaction{}
+			return []transaction.AccountTransaction{}
 		}
 		transactions = append(transactions, t)
 	}

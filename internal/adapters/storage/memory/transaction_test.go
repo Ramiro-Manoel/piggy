@@ -8,12 +8,11 @@ import (
 
 func TestSaveAndRead(t *testing.T) {
 	repo := NewTransactionRepository()
-	transaction := transaction.Transaction{
-		ID:          "1",
-		Description: "Mercado XYZ",
-		Amount:      1050,
-		Date:        time.Now(),
-	}
+	transaction := transaction.AccountTransaction{}
+	transaction.ID = "1"
+	transaction.Description = "Mercado XYZ"
+	transaction.Amount = 1050
+	transaction.Date = time.Now()
 
 	err := repo.Save(transaction)
 	if err != nil {

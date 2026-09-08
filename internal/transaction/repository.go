@@ -1,7 +1,7 @@
 package transaction
 
 type Repository interface {
-	Save(t Transaction) error
-	Read(id string) (Transaction, error)
-	List() []Transaction
+	Save(t AccountTransaction) error
+	Read(id string) (AccountTransaction, error)
+	List() []AccountTransaction
 }

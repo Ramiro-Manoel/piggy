@@ -76,28 +76,28 @@ func (c *client) do(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
-func (c *client) FetchTransactions(accountID string) ([]transaction.Transaction, error) {
+func (c *client) FetchTransactions(accountID string) ([]transaction.AccountTransaction, error) {
 	url := baseURL + "/v2/transactions?accountId=" + accountID
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return []transaction.Transaction{}, err
+		return []transaction.AccountTransaction{}, err
 	}
 
 	resp, err := c.do(req)
 	if err != nil {
-		return []transaction.Transaction{}, err
+		return []transaction.AccountTransaction{}, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return []transaction.Transaction{},
+		return []transaction.AccountTransaction{},
 			fmt.Errorf("pluggy fetch trasactions failed: status %d", resp.StatusCode)
 	}
 
 	var transactionsResp transactionsResponse
 	err = json.NewDecoder(resp.Body).Decode(&transactionsResp)
 	if err != nil {
-		return []transaction.Transaction{}, err
+		return []transaction.AccountTransaction{}, err
 	}
 
 	return toTransactions(transactionsResp.Results)

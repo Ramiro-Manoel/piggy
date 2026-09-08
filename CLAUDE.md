@@ -32,20 +32,25 @@ piggy/
 │   ├── server/          # main.go: API HTTP + webhook do WhatsApp
 │   └── cli/             # main.go: comandos Cobra
 ├── internal/
-│   ├── transaction/     # Transaction (Amount int64 centavos, CategoryID *string, AccountID *string), Repository, Service
+│   ├── transaction/     # struct comum `transaction` (não exportada: ID, Ref, Description, Amount, Date, CategoryID *string) embutida em AccountTransaction (AccountID string) e CardTransaction (InvoiceID string, InstallmentNumber, TotalInstallments int). Repository/Service hoje cobrem só AccountTransaction
 │   ├── category/        # Category (ParentID *string, suporta um nível de subcategoria), Repository, Service
 │   ├── account/         # Account (ID, Number, Name, Owner, Balance int64 centavos), Repository, Service
+│   ├── card/             # [planejado] Card (ID, Ref, Name, Brand, CreditLimit, AvailableLimit, ClosingDay, DueDay), Repository, Service
+│   ├── invoice/          # [planejado] Invoice (ID, CardID, ClosingDate, DueDate, TotalAmount, Status), Repository, Service — decide a qual fatura cada CardTransaction pertence
 │   └── adapters/
 │       ├── storage/
 │       │   ├── memory/  # implementações em memória (transaction, category, account)
-│       │   └── postgres/ # implementações Postgres — pgx/v5 (account implementado)
-│       ├── pluggy/      # implementa FinanceProvider
+│       │   └── postgres/ # implementações Postgres — pgx/v5 (account, transaction, category implementados)
+│       ├── finance_provider/pluggy/ # implementa financeProvider (auth, FetchAccounts, FetchTransactions)
 │       ├── ai/          # implementa Categorizer
 │       └── whatsapp/    # bot whatsmeow
 ├── migrations/          # golang-migrate, up/down SQL por contexto
 │   ├── 001_create_accounts.up.sql / down.sql
 │   ├── 002_create_categories.up.sql / down.sql
-│   └── 003_create_transactions.up.sql / down.sql
+│   ├── 003_create_transactions.up.sql / down.sql
+│   └── [planejado] 004_create_cards, 005_create_invoices, 006_create_card_transactions
+│       (card_transactions referencia invoices, não cards diretamente — sem FK redundante,
+│       já que Invoice.CardID já resolve isso)
 └── go.mod
 Stack escolhida
 Open Finance: Pluggy, via fluxo "Meu Pluggy" (gratuito e sem prazo de expiração para uso pessoal, desde que as contas conectadas sejam do próprio usuário). Sem SDK oficial em Go — consumir a API REST direto via net/http.
@@ -72,21 +77,25 @@ CLI
 Bot de WhatsApp
 Status atual
 
-Fase 1 concluída. Fase 2 (Postgres) em andamento.
+Fase 1 concluída. Fase 2 (Postgres) concluída para account, transaction (AccountTransaction) e category. Integração Pluggy iniciada (client + mapper, autenticação e fetch de contas/transações via sandbox).
 
 Contextos implementados:
-- transaction: struct Transaction (Amount int64, CategoryID *string), interface Repository, Service (Create, List, Read). Implementação em memória.
+- transaction: struct comum não-exportada `transaction` (ID, Ref, Description, Amount, Date, CategoryID *string) embutida em `AccountTransaction` (AccountID string) e `CardTransaction` (InvoiceID string, InstallmentNumber, TotalInstallments int — struct existe, ainda sem Repository/Service/adapter). Repository, Service (Create, List, Read, Sync) cobrem hoje só AccountTransaction. Implementação em memória e Postgres.
 - category: struct Category (ParentID *string), interface Repository, Service (Create, List, Read). Implementação em memória.
-- account: struct Account (Balance int64), interface Repository, Service (Create, List, Read). Implementação em memória E Postgres (pgx/v5).
-- handler: Handler com rotas GET/POST para /transactions, /categories e /accounts. Interfaces locais por contexto em interfaces.go.
-- cmd/server/main.go: injeção de dependências, conexão Postgres via pgx, carregamento de .env via godotenv.
+- account: struct Account (Balance int64), interface Repository, Service (Create, List, Read, Sync). Implementação em memória E Postgres (pgx/v5).
+- handler: Handler com rotas GET/POST para /transactions, /categories, /accounts, e POST /accounts/sync, /transactions/sync/{accountID}. Interfaces locais por contexto em interfaces.go.
+- cmd/server/main.go: injeção de dependências, conexão Postgres via pgx, autenticação Pluggy, carregamento de .env via godotenv.
+- adapters/finance_provider/pluggy: client HTTP (Authenticate, FetchAccounts, FetchTransactions) e mapper pra account.Account / transaction.AccountTransaction.
 
 Pendente (Fase 2):
-- postgres/transaction.go e postgres/category.go — adapters Postgres para transaction e category
-- transaction.Transaction: adicionar campo AccountID string
 - Testes do service (bloqueado por política de AV corporativo — aguardando TI liberar C:\SAPDevelop)
 
+Pendente (cartão — desenho já decidido em conversa, implementação não iniciada):
+- internal/card/: Card, Repository, Service, financeProvider (FetchCards) — mapeado do Pluggy via campo `type: CREDIT` em /accounts (hoje o client só busca contas BANK)
+- internal/invoice/: Invoice, Repository, Service (FindOrCreate, Close, List) — calcula a fatura de cada CardTransaction a partir do ClosingDay do cartão; não confiar no `billId`/`billForecastDate` do Pluggy (vêm nulos na maioria das compras não parceladas em dados reais de sandbox)
+- transaction.Repository/Service viram genéricos (Repository[T], helper saveAll[T identifiable]) pra cobrir CardTransaction sem duplicar a parte de CRUD; CardTransactionService.Sync fica separado do de AccountTransaction porque depende de um invoiceFinder pra resolver InvoiceID antes de salvar
+- migrations 004_create_cards, 005_create_invoices, 006_create_card_transactions
+
 Pendente (fases futuras):
-- transaction.Service: método CategorizeManual e interface FinanceProvider (para Sync via Pluggy)
-- Contexto card (cartão de crédito separado de conta)
+- transaction: método CategorizeManual (categorização manual/IA)
 - cmd/cli/ — Cobra CLI

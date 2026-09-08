@@ -7,9 +7,9 @@ import (
 )
 
 type transactionService interface {
-	Create(transaction.Transaction) error
-	Read(string) (transaction.Transaction, error)
-	List() []transaction.Transaction
+	Create(transaction.AccountTransaction) error
+	Read(string) (transaction.AccountTransaction, error)
+	List() []transaction.AccountTransaction
 	Sync(string) error
 }
 

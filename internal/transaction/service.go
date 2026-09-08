@@ -13,15 +13,15 @@ func NewService(repo Repository, provider financeProvider) *Service {
 		provider: provider}
 }
 
-func (s *Service) Create(t Transaction) error {
+func (s *Service) Create(t AccountTransaction) error {
 	return s.repo.Save(t)
 }
 
-func (s *Service) List() []Transaction {
+func (s *Service) List() []AccountTransaction {
 	return s.repo.List()
 }
 
-func (s *Service) Read(id string) (Transaction, error) {
+func (s *Service) Read(id string) (AccountTransaction, error) {
 	return s.repo.Read(id)
 }
 

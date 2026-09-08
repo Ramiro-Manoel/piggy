@@ -54,7 +54,7 @@ func writeJSON(w http.ResponseWriter, v any) {
 }
 
 func (h *Handler) createTransaction(w http.ResponseWriter, r *http.Request) {
-	t, err := decode[transaction.Transaction](w, r)
+	t, err := decode[transaction.AccountTransaction](w, r)
 	if err != nil {
 		return
 	}

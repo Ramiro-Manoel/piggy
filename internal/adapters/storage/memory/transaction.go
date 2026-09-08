@@ -8,28 +8,28 @@ import (
 var _ transaction.Repository = (*TransactionRepository)(nil)
 
 type TransactionRepository struct {
-	transactions []transaction.Transaction
+	transactions []transaction.AccountTransaction
 }
 
 func NewTransactionRepository() *TransactionRepository {
-	return &TransactionRepository{transactions: make([]transaction.Transaction, 0)}
+	return &TransactionRepository{transactions: make([]transaction.AccountTransaction, 0)}
 }
 
-func (r *TransactionRepository) Save(t transaction.Transaction) error {
+func (r *TransactionRepository) Save(t transaction.AccountTransaction) error {
 	r.transactions = append(r.transactions, t)
 	return nil
 }
 
-func (r *TransactionRepository) Read(id string) (transaction.Transaction, error) {
+func (r *TransactionRepository) Read(id string) (transaction.AccountTransaction, error) {
 	for i := range r.transactions {
 		if r.transactions[i].ID == id {
 			return r.transactions[i], nil
 		}
 	}
-	return transaction.Transaction{}, fmt.Errorf("transaction with id %s not found", id)
+	return transaction.AccountTransaction{}, fmt.Errorf("transaction with id %s not found", id)
 }
 
-func (r *TransactionRepository) List() []transaction.Transaction {
-	transactions := append([]transaction.Transaction{}, r.transactions...)
+func (r *TransactionRepository) List() []transaction.AccountTransaction {
+	transactions := append([]transaction.AccountTransaction{}, r.transactions...)
 	return transactions
 }
