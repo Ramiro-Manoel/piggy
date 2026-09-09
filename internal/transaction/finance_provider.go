@@ -1,5 +1,9 @@
 package transaction
 
-type financeProvider interface {
-	FetchTransactions(accountID string) ([]AccountTransaction, error)
+type accountFinanceProvider interface {
+	FetchTransactions(string) ([]AccountTransaction, error)
+}
+
+type cardFinanceProvider interface {
+	FetchTransactions(string) ([]CardTransaction, error)
 }

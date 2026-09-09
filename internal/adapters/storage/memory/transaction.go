@@ -2,10 +2,9 @@ package memory
 
 import (
 	"fmt"
+
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
-
-var _ transaction.Repository = (*TransactionRepository)(nil)
 
 type TransactionRepository struct {
 	transactions []transaction.AccountTransaction
