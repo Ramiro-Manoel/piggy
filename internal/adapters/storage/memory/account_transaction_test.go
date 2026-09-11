@@ -3,11 +3,12 @@ package memory
 import (
 	"testing"
 	"time"
+
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
 func TestSaveAndRead(t *testing.T) {
-	repo := NewTransactionRepository()
+	repo := NewAccountTransactionRepository()
 	transaction := transaction.AccountTransaction{}
 	transaction.ID = "1"
 	transaction.Description = "Mercado XYZ"
@@ -30,7 +31,7 @@ func TestSaveAndRead(t *testing.T) {
 }
 
 func TestReadNotFound(t *testing.T) {
-	repo := NewTransactionRepository()
+	repo := NewAccountTransactionRepository()
 
 	_, err := repo.Read("non existing ID")
 

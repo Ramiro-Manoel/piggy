@@ -25,7 +25,7 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	transactionRepo := postgres.NewTransactionRepository(conn)
+	transactionRepo := postgres.NewAccountTransactionRepository(conn)
 	categoryRepo := postgres.NewCategoryRepository(conn)
 	accountRepo := postgres.NewAccountRepository(conn)
 
@@ -35,7 +35,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	transactionSvc := transaction.NewService(transactionRepo, financeProvider)
+	transactionSvc := transaction.NewAccountService(transactionRepo, financeProvider)
 	categorySvc := category.NewService(categoryRepo)
 	accountSvc := account.NewService(accountRepo, financeProvider)
 
