@@ -1,4 +1,4 @@
-CREATE TABLE transactions (
+CREATE TABLE account_transactions (
     id           TEXT PRIMARY KEY,
 	external_id	 TEXT,
 	source 		 TEXT,
@@ -9,6 +9,6 @@ CREATE TABLE transactions (
 	account_id   TEXT REFERENCES accounts(id) NOT NULL
 );
 
-CREATE UNIQUE INDEX transactions_external_unique
-	ON transactions (external_id, source)
+CREATE UNIQUE INDEX account_transactions_external_unique
+	ON account_transactions (external_id, source)
 	WHERE external_id IS NOT NULL;

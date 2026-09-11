@@ -3,21 +3,20 @@ package postgres
 import (
 	"context"
 
-	"github.com/Ramiro-Manoel/piggy/internal/accountTrnansaction"
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 	"github.com/jackc/pgx/v5"
 )
 
-type accountTrnansactionRepository struct {
+type accountTransactionRepository struct {
 	db *pgx.Conn
 }
 
-func NewAccountaccountTrnansactionRepository(db *pgx.Conn) *transactionRepository {
-	return &accountTrnansactionRepository{db: db}
+func NewAccountTransactionRepository(db *pgx.Conn) *accountTransactionRepository {
+	return &accountTransactionRepository{db: db}
 }
 
-func (r *accountTrnansactionRepository) scan(row pgx.Row) (transaction.AccountTransaction, error) {
-	var t accountTrnansaction.AccountTransaction
+func (r *accountTransactionRepository) scan(row pgx.Row) (transaction.AccountTransaction, error) {
+	var t transaction.AccountTransaction
 	err := row.Scan(
 		&t.ID,
 		&t.Ref.ExternalID,
@@ -28,14 +27,14 @@ func (r *accountTrnansactionRepository) scan(row pgx.Row) (transaction.AccountTr
 		&t.CategoryID,
 		&t.AccountID)
 	if err != nil {
-		return accountTrnansaction.AccountTransaction{}, err
+		return transaction.AccountTransaction{}, err
 	}
 	return t, nil
 }
 
-func (r *accountTrnansactionRepository) Save(t transaction.AccountTransaction) error {
+func (r *accountTransactionRepository) Save(t transaction.AccountTransaction) error {
 	_, err := r.db.Exec(context.Background(), `
-		INSERT INTO accountTrnansactions (id, external_id, source, description, amount, date, category_id, account_id)
+		INSERT INTO account_transactions (id, external_id, source, description, amount, date, category_id, account_id)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 			ON CONFLICT (external_id, source) DO NOTHING
 		`, t.ID, t.Ref.ExternalID, t.Ref.Source, t.Description, t.Amount, t.Date, t.CategoryID, t.AccountID)
@@ -43,36 +42,36 @@ func (r *accountTrnansactionRepository) Save(t transaction.AccountTransaction) e
 	return err
 }
 
-func (r *accountTrnansactionRepository) Read(id string) (transaction.AccountTransaction, error) {
+func (r *accountTransactionRepository) Read(id string) (transaction.AccountTransaction, error) {
 	row := r.db.QueryRow(context.Background(), `
 	SELECT id, external_id, source, description, amount, date, category_id, account_id
-	FROM accountTrnansactions
+	FROM account_transactions
 	WHERE id = $1
 	`, id)
 
 	t, err := r.scan(row)
 	if err != nil {
-		return accountTrnansaction.AccountTransaction{}, err
+		return transaction.AccountTransaction{}, err
 	}
 	return t, nil
 }
-func (r *accountTrnansactionRepository) List() []transaction.AccountTransaction {
+func (r *accountTransactionRepository) List() []transaction.AccountTransaction {
 	rows, err := r.db.Query(context.Background(), `
 	SELECT id, external_id, source, description, amount, date, category_id, account_id
-	FROM accountTrnansactions
+	FROM account_transactions
 	`)
 	if err != nil {
-		return []accountTrnansaction.AccountTransaction{}
+		return []transaction.AccountTransaction{}
 	}
 	defer rows.Close()
 
-	var accountTrnansactions []transaction.AccountTransaction
+	var transactions []transaction.AccountTransaction
 	for rows.Next() {
 		t, err := r.scan(rows)
 		if err != nil {
-			return []accountTrnansaction.AccountTransaction{}
+			return []transaction.AccountTransaction{}
 		}
-		accountTrnansactions = append(transactions, t)
+		transactions = append(transactions, t)
 	}
-	return accountTrnansactions
+	return transactions
 }
