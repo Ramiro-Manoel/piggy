@@ -7,29 +7,25 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+func toAccountTransaction(row accountTransactionRow) transaction.AccountTransaction {
+	t := transaction.AccountTransaction{AccountID: row.AccountID}
+	t.ID = row.ID
+	t.Ref.ExternalID = row.ExternalID
+	t.Ref.Source = row.Source
+	t.Description = row.Description
+	t.Amount = row.Amount
+	t.Date = row.Date
+	t.CategoryID = row.CategoryID
+
+	return t
+}
+
 type accountTransactionRepository struct {
 	db *pgx.Conn
 }
 
 func NewAccountTransactionRepository(db *pgx.Conn) *accountTransactionRepository {
 	return &accountTransactionRepository{db: db}
-}
-
-func (r *accountTransactionRepository) scan(row pgx.Row) (transaction.AccountTransaction, error) {
-	var t transaction.AccountTransaction
-	err := row.Scan(
-		&t.ID,
-		&t.Ref.ExternalID,
-		&t.Ref.Source,
-		&t.Description,
-		&t.Amount,
-		&t.Date,
-		&t.CategoryID,
-		&t.AccountID)
-	if err != nil {
-		return transaction.AccountTransaction{}, err
-	}
-	return t, nil
 }
 
 func (r *accountTransactionRepository) Save(t transaction.AccountTransaction) error {
@@ -43,35 +39,38 @@ func (r *accountTransactionRepository) Save(t transaction.AccountTransaction) er
 }
 
 func (r *accountTransactionRepository) Read(id string) (transaction.AccountTransaction, error) {
-	row := r.db.QueryRow(context.Background(), `
-	SELECT id, external_id, source, description, amount, date, category_id, account_id
-	FROM account_transactions
-	WHERE id = $1
+	rows, err := r.db.Query(context.Background(), `
+	SELECT * FROM account_transactions WHERE id = $1
 	`, id)
-
-	t, err := r.scan(row)
 	if err != nil {
 		return transaction.AccountTransaction{}, err
 	}
-	return t, nil
+	defer rows.Close()
+
+	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[accountTransactionRow])
+	if err != nil {
+		return transaction.AccountTransaction{}, err
+	}
+
+	return toAccountTransaction(row), nil
 }
 func (r *accountTransactionRepository) List() []transaction.AccountTransaction {
 	rows, err := r.db.Query(context.Background(), `
-	SELECT id, external_id, source, description, amount, date, category_id, account_id
-	FROM account_transactions
+	SELECT * FROM account_transactions
 	`)
 	if err != nil {
 		return []transaction.AccountTransaction{}
 	}
 	defer rows.Close()
 
+	transactionRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[accountTransactionRow])
+	if err != nil {
+		return []transaction.AccountTransaction{}
+	}
+
 	var transactions []transaction.AccountTransaction
-	for rows.Next() {
-		t, err := r.scan(rows)
-		if err != nil {
-			return []transaction.AccountTransaction{}
-		}
-		transactions = append(transactions, t)
+	for _, row := range transactionRows {
+		transactions = append(transactions, toAccountTransaction(row))
 	}
 	return transactions
 }

@@ -4,8 +4,33 @@ import (
 	"context"
 
 	"github.com/Ramiro-Manoel/piggy/internal/account"
+	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/jackc/pgx/v5"
 )
+
+type accountRow struct {
+	ID         string `db:"id"`
+	ExternalID string `db:"external_id"`
+	Source     string `db:"source"`
+	Name       string `db:"name"`
+	Number     string `db:"number"`
+	Owner      string `db:"owner"`
+	Balance    int64  `db:"balance"`
+}
+
+func toAccount(row accountRow) account.Account {
+	return account.Account{
+		ID: row.ID,
+		Ref: external.Reference{
+			ExternalID: row.ExternalID,
+			Source:     row.Source,
+		},
+		Name:    row.Name,
+		Number:  row.Number,
+		Owner:   row.Owner,
+		Balance: row.Balance,
+	}
+}
 
 type accountRepository struct {
 	db *pgx.Conn
@@ -15,15 +40,6 @@ func NewAccountRepository(db *pgx.Conn) *accountRepository {
 	return &accountRepository{db: db}
 }
 
-func (r *accountRepository) scan(row pgx.Row) (account.Account, error) {
-	var a account.Account
-	err := row.Scan(&a.ID, &a.Ref.ExternalID, &a.Ref.Source, &a.Name, &a.Number, &a.Owner, &a.Balance)
-	if err != nil {
-		return account.Account{}, err
-	}
-	return a, nil
-
-}
 func (r *accountRepository) Save(a account.Account) error {
 	_, err := r.db.Exec(context.Background(), `
 		INSERT INTO accounts (id, external_id, source, name, number, owner, balance)
@@ -35,35 +51,38 @@ func (r *accountRepository) Save(a account.Account) error {
 }
 
 func (r *accountRepository) Read(id string) (account.Account, error) {
-	row := r.db.QueryRow(context.Background(), `
-	SELECT id, external_id, source, name, number, owner, balance FROM accounts 
-		WHERE id = $1
+	rows, err := r.db.Query(context.Background(), `
+	SELECT * FROM accounts WHERE id = $1
 	`, id)
-
-	a, err := r.scan(row)
 	if err != nil {
 		return account.Account{}, err
 	}
-	return a, nil
+	defer rows.Close()
+
+	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[accountRow])
+	if err != nil {
+		return account.Account{}, err
+	}
+	return toAccount(row), nil
 }
 
 func (r *accountRepository) List() []account.Account {
 	rows, err := r.db.Query(context.Background(), `
-	SELECT id, external_id, source, name, number, owner, balance 
-		FROM accounts 
+	SELECT * FROM accounts 
 	`)
 	if err != nil {
 		return []account.Account{}
 	}
 	defer rows.Close()
 
+	accountRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[accountRow])
+	if err != nil {
+		return []account.Account{}
+	}
+
 	var accounts []account.Account
-	for rows.Next() {
-		a, err := r.scan(rows)
-		if err != nil {
-			return []account.Account{}
-		}
-		accounts = append(accounts, a)
+	for _, row := range accountRows {
+		accounts = append(accounts, toAccount(row))
 	}
 	return accounts
 }

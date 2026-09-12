@@ -2,24 +2,10 @@ package postgres
 
 import (
 	"context"
-	"time"
 
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 	"github.com/jackc/pgx/v5"
 )
-
-type cardTransactionRow struct {
-	ID                string    `db:"id"`
-	ExternalID        string    `db:"external_id"`
-	Source            string    `db:"source"`
-	Description       string    `db:"description"`
-	Amount            int64     `db:"amount"`
-	Date              time.Time `db:"date"`
-	CategoryID        *string   `db:"category_id"`
-	InvoiceID         string    `db:"invoice_id"`
-	InstallmentNumber int       `db:"installment_number"`
-	TotalInstallments int       `db:"total_installments"`
-}
 
 func toCardTransaction(row cardTransactionRow) transaction.CardTransaction {
 	t := transaction.CardTransaction{
@@ -69,6 +55,7 @@ func (r *cardTransactionRepository) Read(id string) (transaction.CardTransaction
 	if err != nil {
 		return transaction.CardTransaction{}, err
 	}
+	defer rows.Close()
 
 	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[cardTransactionRow])
 	if err != nil {
@@ -87,12 +74,12 @@ func (r *cardTransactionRepository) List() []transaction.CardTransaction {
 	}
 	defer rows.Close()
 
-	cardTransactionRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[cardTransactionRow])
+	transactionRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[cardTransactionRow])
 	if err != nil {
 		return []transaction.CardTransaction{}
 	}
 	var transactions []transaction.CardTransaction
-	for _, row := range cardTransactionRows {
+	for _, row := range transactionRows {
 		transactions = append(transactions, toCardTransaction(row))
 	}
 	return transactions
