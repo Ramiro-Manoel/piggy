@@ -6,20 +6,20 @@ import (
 	"github.com/Ramiro-Manoel/piggy/internal/account"
 )
 
-type AccountRepository struct {
+type accountRepository struct {
 	accounts []account.Account
 }
 
-func NewAccountRepository() *AccountRepository {
-	return &AccountRepository{accounts: make([]account.Account, 0)}
+func NewAccountRepository() *accountRepository {
+	return &accountRepository{accounts: make([]account.Account, 0)}
 }
 
-func (r *AccountRepository) Save(a account.Account) error {
+func (r *accountRepository) Save(a account.Account) error {
 	r.accounts = append(r.accounts, a)
 	return nil
 }
 
-func (r *AccountRepository) Read(id string) (account.Account, error) {
+func (r *accountRepository) Read(id string) (account.Account, error) {
 	for i := range r.accounts {
 		if r.accounts[i].ID == id {
 			return r.accounts[i], nil
@@ -28,7 +28,7 @@ func (r *AccountRepository) Read(id string) (account.Account, error) {
 	return account.Account{}, fmt.Errorf("account with id %s not found", id)
 }
 
-func (r *AccountRepository) List() []account.Account {
+func (r *accountRepository) List() []account.Account {
 	accounts := append([]account.Account{}, r.accounts...)
 	return accounts
 }

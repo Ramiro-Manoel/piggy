@@ -8,16 +8,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-type accountRow struct {
-	ID         string `db:"id"`
-	ExternalID string `db:"external_id"`
-	Source     string `db:"source"`
-	Name       string `db:"name"`
-	Number     string `db:"number"`
-	Owner      string `db:"owner"`
-	Balance    int64  `db:"balance"`
-}
-
 func toAccount(row accountRow) account.Account {
 	return account.Account{
 		ID: row.ID,

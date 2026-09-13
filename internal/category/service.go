@@ -1,21 +1,21 @@
 package category
 
-type Service struct {
-	repo Repository
+type service struct {
+	repo repository
 }
 
-func NewService(r Repository) *Service {
-	return &Service{repo: r}
+func NewService(r repository) *service {
+	return &service{repo: r}
 }
 
-func (s *Service) Create(c Category) error {
+func (s *service) Create(c Category) error {
 	return s.repo.Save(c)
 }
 
-func (s *Service) Read(id string) (Category, error) {
+func (s *service) Read(id string) (Category, error) {
 	return s.repo.Read(id)
 }
 
-func (s *Service) List() []Category {
+func (s *service) List() []Category {
 	return s.repo.List()
 }

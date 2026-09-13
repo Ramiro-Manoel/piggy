@@ -2,30 +2,30 @@ package account
 
 import "fmt"
 
-type Service struct {
-	repo     Repository
+type service struct {
+	repo     repository
 	provider financeProvider
 }
 
-func NewService(r Repository, p financeProvider) *Service {
-	return &Service{
+func NewService(r repository, p financeProvider) *service {
+	return &service{
 		repo:     r,
 		provider: p}
 }
 
-func (s *Service) Create(a Account) error {
+func (s *service) Create(a Account) error {
 	return s.repo.Save(a)
 }
 
-func (s *Service) Read(id string) (Account, error) {
+func (s *service) Read(id string) (Account, error) {
 	return s.repo.Read(id)
 }
 
-func (s *Service) List() []Account {
+func (s *service) List() []Account {
 	return s.repo.List()
 }
 
-func (s *Service) Sync(institutionID string) error {
+func (s *service) Sync(institutionID string) error {
 	accounts, err := s.provider.FetchAccounts(institutionID)
 	if err != nil {
 		return err
