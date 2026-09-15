@@ -1,5 +1,5 @@
 package card
 
 type financeProvider interface {
-	FetchCards(string) []Card
+	FetchCards(string) ([]Card, error)
 }

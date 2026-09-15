@@ -24,6 +24,17 @@ func (s *service) List() []Card {
 	return s.repo.List()
 }
 
-func (s *service) Sync(institutionID string) []Card {
-	return s.provider.FetchCards(institutionID)
+func (s *service) Sync(institutionID string) error {
+	cards, err := s.provider.FetchCards(institutionID)
+	if err != nil {
+		return err
+	}
+
+	for _, c := range cards {
+		err = s.repo.Save(c)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
