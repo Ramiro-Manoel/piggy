@@ -1,13 +1,42 @@
 package pluggy
 
 import (
+	"encoding/json"
+	"fmt"
 	"math"
+	"net/http"
 	"time"
 
-	"github.com/Ramiro-Manoel/piggy/internal/account"
 	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
+
+func (c *client) FetchTransactions(accountID string) ([]transaction.AccountTransaction, error) {
+	url := baseURL + transactionsPath + "?accountId=" + accountID
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []transaction.AccountTransaction{}, err
+	}
+
+	resp, err := c.do(req)
+	if err != nil {
+		return []transaction.AccountTransaction{}, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return []transaction.AccountTransaction{},
+			fmt.Errorf("pluggy fetch trasactions failed: status %d", resp.StatusCode)
+	}
+
+	var transactionsResp transactionsResponse
+	err = json.NewDecoder(resp.Body).Decode(&transactionsResp)
+	if err != nil {
+		return []transaction.AccountTransaction{}, err
+	}
+
+	return toTransactions(transactionsResp.Results)
+}
 
 func toTransaction(pt pluggyTransaction) (transaction.AccountTransaction, error) {
 	date, err := time.Parse(time.RFC3339Nano, pt.Date)
@@ -36,28 +65,4 @@ func toTransactions(pts []pluggyTransaction) ([]transaction.AccountTransaction, 
 		transactions = append(transactions, t)
 	}
 	return transactions, nil
-}
-
-func toAccount(pa pluggyAccount) (account.Account, error) {
-	return account.Account{
-		Ref: external.Reference{
-			ExternalID: pa.ID,
-			Source:     source},
-		Number:  pa.Number,
-		Name:    pa.Name,
-		Balance: int64(math.Round(pa.Balance * 100)),
-		Owner:   pa.Owner,
-	}, nil
-}
-
-func toAccounts(pas []pluggyAccount) ([]account.Account, error) {
-	var accounts []account.Account
-	for _, pa := range pas {
-		a, err := toAccount(pa)
-		if err != nil {
-			return []account.Account{}, err
-		}
-		accounts = append(accounts, a)
-	}
-	return accounts, nil
 }

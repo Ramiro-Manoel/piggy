@@ -1,5 +1,13 @@
 package pluggy
 
+type accountType string
+
+const (
+	accountTypeAll    accountType = ""
+	accountTypeBank   accountType = "BANK"
+	accountTypeCredit accountType = "CREDIT"
+)
+
 type authRequest struct {
 	ClientId     string `json:"clientId"`
 	ClientSecret string `json:"clientSecret"`
@@ -26,9 +34,19 @@ type accountsResponse struct {
 }
 
 type pluggyAccount struct {
-	ID      string  `json:"id"`
-	Number  string  `json:"number"`
-	Name    string  `json:"name"`
-	Balance float64 `json:"balance"`
-	Owner   string  `json:"owner"`
+	ID         string           `json:"id"`
+	Type       string           `json:"type"`
+	Number     string           `json:"number"`
+	Name       string           `json:"name"`
+	Balance    float64          `json:"balance"`
+	Owner      string           `json:"owner"`
+	CreditData pluggyCreditData `json:"creditData"`
+}
+
+type pluggyCreditData struct {
+	Brand            string  `json:"brand"`
+	CreditLimit      float64 `json:"creditLimit"`
+	AvailableLimit   float64 `json:"availableCreditLimit"`
+	BalanceCloseDate string  `json:"balanceCloseDate"`
+	BalanceDueDate   string  `json:"balanceDueDate"`
 }

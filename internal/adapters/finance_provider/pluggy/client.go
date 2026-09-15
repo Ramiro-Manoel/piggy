@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/Ramiro-Manoel/piggy/internal/account"
-	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
-const baseURL = "https://api.pluggy.ai"
+const (
+	baseURL          = "https://api.pluggy.ai"
+	authPath         = "/auth"
+	accountsPath     = "/accounts"
+	transactionsPath = "/v2/transactions"
+)
 const source = "pluggy"
 
 type client struct {
@@ -26,14 +28,14 @@ func NewClient(clientID, clientSecret string) *client {
 }
 
 func (c *client) Authenticate() error {
-	url := baseURL + "/auth"
+	url := baseURL + authPath
 
 	body, err := json.Marshal(authRequest{ClientId: c.clientID, ClientSecret: c.clientSecret})
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
@@ -76,55 +78,33 @@ func (c *client) do(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
-func (c *client) FetchTransactions(accountID string) ([]transaction.AccountTransaction, error) {
-	url := baseURL + "/v2/transactions?accountId=" + accountID
+func (c *client) fetchAccounts(itemID string, t accountType) (accountsResponse, error) {
+	url := baseURL + accountsPath + "?itemId=" + itemID
+
+	if t != accountTypeAll {
+		url += "&type=" + string(t)
+	}
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return []transaction.AccountTransaction{}, err
+		return accountsResponse{}, err
 	}
 
 	resp, err := c.do(req)
 	if err != nil {
-		return []transaction.AccountTransaction{}, err
+		return accountsResponse{}, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return []transaction.AccountTransaction{},
-			fmt.Errorf("pluggy fetch trasactions failed: status %d", resp.StatusCode)
-	}
-
-	var transactionsResp transactionsResponse
-	err = json.NewDecoder(resp.Body).Decode(&transactionsResp)
-	if err != nil {
-		return []transaction.AccountTransaction{}, err
-	}
-
-	return toTransactions(transactionsResp.Results)
-}
-
-func (c *client) FetchAccounts(itemID string) ([]account.Account, error) {
-	url := baseURL + "/accounts" + "?itemId=" + itemID
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return []account.Account{}, err
-	}
-
-	resp, err := c.do(req)
-	if err != nil {
-		return []account.Account{}, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return []account.Account{},
+		return accountsResponse{},
 			fmt.Errorf("pluggy fetch accounts failed: status %d", resp.StatusCode)
 	}
 
 	var accountsResp accountsResponse
 	err = json.NewDecoder(resp.Body).Decode(&accountsResp)
 	if err != nil {
-		return []account.Account{}, err
+		return accountsResponse{}, err
 	}
-	return toAccounts(accountsResp.Results)
+
+	return accountsResp, nil
 }
