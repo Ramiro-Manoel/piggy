@@ -1,5 +1,5 @@
 package card
 
 type financeProvider interface {
-	FetchCards() []Card
+	FetchCards(string) []Card
 }

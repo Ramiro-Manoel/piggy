@@ -24,6 +24,6 @@ func (s *service) List() []Card {
 	return s.repo.List()
 }
 
-func (s *service) Sync() []Card {
-	return s.provider.FetchCards()
+func (s *service) Sync(institutionID string) []Card {
+	return s.provider.FetchCards(institutionID)
 }
