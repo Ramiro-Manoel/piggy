@@ -26,7 +26,7 @@ func (s *AccountService) Read(id string) (AccountTransaction, error) {
 }
 
 func (s *AccountService) Sync(accountID string) error {
-	transactions, err := s.provider.FetchTransactions(accountID)
+	transactions, err := s.provider.FetchAccountTransactions(accountID)
 	if err != nil {
 		return err
 	}

@@ -26,7 +26,7 @@ func (s *CardService) Read(id string) (CardTransaction, error) {
 }
 
 func (s *CardService) Sync(cardID string) error {
-	transactions, err := s.provider.FetchTransactions(cardID)
+	transactions, err := s.provider.FetchCardTransactions(cardID)
 	if err != nil {
 		return err
 	}

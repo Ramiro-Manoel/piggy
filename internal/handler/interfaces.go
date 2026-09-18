@@ -6,10 +6,17 @@ import (
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
-type transactionService interface {
+type accountTransactionService interface {
 	Create(transaction.AccountTransaction) error
 	Read(string) (transaction.AccountTransaction, error)
 	List() []transaction.AccountTransaction
+	Sync(string) error
+}
+
+type cardTransactionService interface {
+	Create(transaction.CardTransaction) error
+	Read(string) (transaction.CardTransaction, error)
+	List() []transaction.CardTransaction
 	Sync(string) error
 }
 

@@ -3,39 +3,46 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/Ramiro-Manoel/piggy/internal/account"
-	"github.com/Ramiro-Manoel/piggy/internal/category"
-	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
 type Handler struct {
-	transactionSvc transactionService
-	categorySvc    categoryService
-	accountSvc     accountService
-	institutionID  string
+	accountTransactionSvc accountTransactionService
+	cardTransactionSvc    cardTransactionService
+	categorySvc           categoryService
+	accountSvc            accountService
+	institutionID         string
 }
 
-func NewHandler(transactionSvc transactionService, categorySvc categoryService, accountSvc accountService, institutionID string) *Handler {
+func NewHandler(
+	accountTransactionSvc accountTransactionService,
+	cardTransactionSvc cardTransactionService,
+	categorySvc categoryService,
+	accountSvc accountService,
+	institutionID string,
+
+) *Handler {
+
 	return &Handler{
-		transactionSvc: transactionSvc,
-		categorySvc:    categorySvc,
-		accountSvc:     accountSvc,
-		institutionID:  institutionID,
+		accountTransactionSvc: accountTransactionSvc,
+		cardTransactionSvc:    cardTransactionSvc,
+		categorySvc:           categorySvc,
+		accountSvc:            accountSvc,
+		institutionID:         institutionID,
 	}
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /transactions", h.listTransactions)
-	mux.HandleFunc("POST /transactions", h.createTransaction)
-	mux.HandleFunc("POST /transactions/sync/{accountID}", h.syncTransactions)
+	mux.HandleFunc("GET /accounts", h.listAccounts)
+	mux.HandleFunc("POST /accounts", h.createAccount)
+	mux.HandleFunc("POST /accounts/sync", h.syncAccounts)
+	mux.HandleFunc("POST /accounts/{accountID}/transactions/sync", h.syncAccountTransactions)
+
+	mux.HandleFunc("GET /transactions", h.listAccountTransactions)
+	mux.HandleFunc("POST /transactions", h.createAccountTransaction)
 
 	mux.HandleFunc("GET /categories", h.listCategories)
 	mux.HandleFunc("POST /categories", h.createCategory)
 
-	mux.HandleFunc("GET /accounts", h.listAccounts)
-	mux.HandleFunc("POST /accounts", h.createAccount)
-	mux.HandleFunc("POST /accounts/sync", h.syncAccounts)
 }
 
 func decode[T any](w http.ResponseWriter, r *http.Request) (T, error) {
@@ -51,81 +58,4 @@ func decode[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 func writeJSON(w http.ResponseWriter, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(v)
-}
-
-func (h *Handler) createTransaction(w http.ResponseWriter, r *http.Request) {
-	t, err := decode[transaction.AccountTransaction](w, r)
-	if err != nil {
-		return
-	}
-
-	err = h.transactionSvc.Create(t)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-}
-
-func (h *Handler) listTransactions(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, h.transactionSvc.List())
-}
-
-func (h *Handler) syncTransactions(w http.ResponseWriter, r *http.Request) {
-	accountID := r.PathValue("accountID")
-
-	err := h.transactionSvc.Sync(accountID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func (h *Handler) createCategory(w http.ResponseWriter, r *http.Request) {
-	c, err := decode[category.Category](w, r)
-	if err != nil {
-		return
-	}
-
-	err = h.categorySvc.Create(c)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-}
-
-func (h *Handler) listCategories(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, h.categorySvc.List())
-}
-
-func (h *Handler) createAccount(w http.ResponseWriter, r *http.Request) {
-	a, err := decode[account.Account](w, r)
-	if err != nil {
-		return
-	}
-
-	err = h.accountSvc.Create(a)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-}
-
-func (h *Handler) listAccounts(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, h.accountSvc.List())
-}
-
-func (h *Handler) syncAccounts(w http.ResponseWriter, r *http.Request) {
-	err := h.accountSvc.Sync(h.institutionID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusNoContent)
 }

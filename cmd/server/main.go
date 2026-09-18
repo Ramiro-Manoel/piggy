@@ -25,7 +25,8 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	transactionRepo := postgres.NewAccountTransactionRepository(conn)
+	accountTransactionRepo := postgres.NewAccountTransactionRepository(conn)
+	cardTransactionRepo := postgres.NewCardTransactionRepository(conn)
 	categoryRepo := postgres.NewCategoryRepository(conn)
 	accountRepo := postgres.NewAccountRepository(conn)
 
@@ -35,11 +36,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	transactionSvc := transaction.NewAccountService(transactionRepo, financeProvider)
+	transactionSvc := transaction.NewAccountService(accountTransactionRepo, financeProvider)
+	cardTransactionSvc := transaction.NewCardService(cardTransactionRepo, financeProvider)
 	categorySvc := category.NewService(categoryRepo)
 	accountSvc := account.NewService(accountRepo, financeProvider)
 
-	handler := handler.NewHandler(transactionSvc, categorySvc, accountSvc, os.Getenv("PLUGGY_INSTITUTION_ID"))
+	handler := handler.NewHandler(transactionSvc, cardTransactionSvc, categorySvc, accountSvc, os.Getenv("PLUGGY_INSTITUTION_ID"))
 
 	mux := http.NewServeMux()
 	handler.RegisterRoutes(mux)

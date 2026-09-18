@@ -78,6 +78,24 @@ func (c *client) do(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
+func (c *client) get(url string) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil,
+			fmt.Errorf("pluggy request failed: status %d", resp.StatusCode)
+	}
+	return resp, nil
+}
+
 func (c *client) fetchAccounts(itemID string, t accountType) (accountsResponse, error) {
 	url := baseURL + accountsPath + "?itemId=" + itemID
 
@@ -85,20 +103,11 @@ func (c *client) fetchAccounts(itemID string, t accountType) (accountsResponse, 
 		url += "&type=" + string(t)
 	}
 
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return accountsResponse{}, err
-	}
-
-	resp, err := c.do(req)
+	resp, err := c.get(url)
 	if err != nil {
 		return accountsResponse{}, err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return accountsResponse{},
-			fmt.Errorf("pluggy fetch accounts failed: status %d", resp.StatusCode)
-	}
 
 	var accountsResp accountsResponse
 	err = json.NewDecoder(resp.Body).Decode(&accountsResp)
@@ -107,4 +116,22 @@ func (c *client) fetchAccounts(itemID string, t accountType) (accountsResponse, 
 	}
 
 	return accountsResp, nil
+}
+
+func (c *client) fetchTransactions(accountID string) (transactionsResponse, error) {
+	url := baseURL + transactionsPath + "?accountId=" + accountID
+
+	resp, err := c.get(url)
+	if err != nil {
+		return transactionsResponse{}, err
+	}
+	defer resp.Body.Close()
+
+	var transactionsResp transactionsResponse
+	err = json.NewDecoder(resp.Body).Decode(&transactionsResp)
+	if err != nil {
+		return transactionsResponse{}, err
+	}
+
+	return transactionsResp, nil
 }

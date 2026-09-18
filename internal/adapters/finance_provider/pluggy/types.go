@@ -22,11 +22,18 @@ type transactionsResponse struct {
 }
 
 type pluggyTransaction struct {
-	ID          string  `json:"id"`
-	Description string  `json:"description"`
-	Amount      float64 `json:"amount"`
-	Date        string  `json:"date"`
-	AccountID   string  `json:"accountId"`
+	ID                 string                   `json:"id"`
+	Description        string                   `json:"description"`
+	Amount             float64                  `json:"amount"`
+	Date               string                   `json:"date"`
+	AccountID          string                   `json:"accountId"`
+	CreditCardMetadata pluggyCreditCardMetadata `json:"creditCardMetadata"`
+}
+
+type pluggyCreditCardMetadata struct {
+	InstallmentNumber int    `json:"installmentNumber"`
+	TotalInstallments int    `json:"totalInstallments"`
+	CardNumber        string `json:"cardNumber"`
 }
 
 type accountsResponse struct {
