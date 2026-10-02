@@ -2,9 +2,9 @@ package invoice
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Ramiro-Manoel/piggy/internal/card"
-	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
 type service struct {
@@ -17,8 +17,8 @@ func NewService(r repository) *service {
 	}
 }
 
-func (s service) FindOrCreate(c card.Card, t transaction.CardTransaction) (Invoice, error) {
-	closeDate := nextOccurrence(t.Date, c.ClosingDay)
+func (s service) FindOrCreate(c card.Card, transactionDate time.Time) (Invoice, error) {
+	closeDate := nextOccurrence(transactionDate, c.ClosingDay)
 
 	invoices, err := s.repo.List(Filter{
 		CloseDate: DateRange{Start: &closeDate, End: &closeDate},
