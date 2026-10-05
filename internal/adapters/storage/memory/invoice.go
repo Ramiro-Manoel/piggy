@@ -2,6 +2,7 @@ package memory
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/Ramiro-Manoel/piggy/internal/invoice"
 )
@@ -28,7 +29,28 @@ func (r *invoiceRepository) Read(id string) (invoice.Invoice, error) {
 	return invoice.Invoice{}, fmt.Errorf("category with id %s not found", id)
 }
 
-func (r *invoiceRepository) List() []invoice.Invoice {
-	categories := append([]invoice.Invoice{}, r.invoices...)
-	return categories
+func (r *invoiceRepository) List(f invoice.Filter) ([]invoice.Invoice, error) {
+	invoices := []invoice.Invoice{}
+	for _, i := range r.invoices {
+		if matches(i, f) {
+			invoices = append(invoices, i)
+		}
+	}
+	return invoices, nil
+}
+
+func matches(i invoice.Invoice, f invoice.Filter) bool {
+	if len(f.CardIDs) > 0 && !slices.Contains(f.CardIDs, i.CardID) {
+		return false
+	}
+
+	if f.CloseDate.Start != nil && i.CloseDate.Before(*f.CloseDate.Start) {
+		return false
+	}
+	if f.CloseDate.End != nil && i.CloseDate.After(*f.CloseDate.End) {
+		return false
+	}
+
+	return true
+
 }
