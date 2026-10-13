@@ -8,7 +8,6 @@ import (
 
 	"github.com/Ramiro-Manoel/piggy/internal/account"
 	"github.com/Ramiro-Manoel/piggy/internal/adapters/finance_provider/pluggy"
-	"github.com/Ramiro-Manoel/piggy/internal/adapters/storage/memory"
 	"github.com/Ramiro-Manoel/piggy/internal/adapters/storage/postgres"
 	"github.com/Ramiro-Manoel/piggy/internal/card"
 	"github.com/Ramiro-Manoel/piggy/internal/category"
@@ -30,7 +29,7 @@ func main() {
 
 	accountTransactionRepo := postgres.NewAccountTransactionRepository(conn)
 	cardRepo := postgres.NewCardRepository(conn)
-	invoiceRepo := memory.NewInvoiceRepository()
+	invoiceRepo := postgres.NewInvoiceRepository(conn)
 	cardTransactionRepo := postgres.NewCardTransactionRepository(conn)
 	categoryRepo := postgres.NewCategoryRepository(conn)
 	accountRepo := postgres.NewAccountRepository(conn)
