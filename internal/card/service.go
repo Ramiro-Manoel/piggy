@@ -1,5 +1,7 @@
 package card
 
+import "github.com/google/uuid"
+
 type service struct {
 	repo     repository
 	provider financeProvider
@@ -31,6 +33,7 @@ func (s *service) Sync(institutionID string) error {
 	}
 
 	for _, c := range cards {
+		c.ID = uuid.NewString()
 		err = s.repo.Save(c)
 		if err != nil {
 			return err

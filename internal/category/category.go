@@ -1,7 +1,7 @@
 package category
 
 type Category struct {
-	ID string
-	Name string
+	ID       string
+	Name     string
 	ParentID *string
 }

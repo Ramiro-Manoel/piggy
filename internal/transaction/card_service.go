@@ -1,6 +1,10 @@
 package transaction
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/google/uuid"
+)
 
 type CardService struct {
 	repo     cardRepository
@@ -47,6 +51,7 @@ func (s *CardService) Sync(cardID string) error {
 			return fmt.Errorf("Sync: find or create invoice for transaction %s: %w", t.ID, err)
 		}
 		t.InvoiceID = inv.ID
+		t.ID = uuid.NewString()
 		if err := s.repo.Save(t); err != nil {
 			return fmt.Errorf("Sync: save transaction %s: %w", t.ID, err)
 		}

@@ -1,6 +1,10 @@
 package transaction
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/google/uuid"
+)
 
 type AccountService struct {
 	repo     accountRepository
@@ -32,6 +36,7 @@ func (s *AccountService) Sync(accountID string) error {
 	}
 
 	for _, t := range transactions {
+		t.ID = uuid.NewString()
 		err = s.repo.Save(t)
 		if err != nil {
 			return fmt.Errorf("save account transaction %s: %w", t.ID, err)

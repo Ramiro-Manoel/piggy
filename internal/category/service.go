@@ -1,5 +1,7 @@
 package category
 
+import "github.com/google/uuid"
+
 type service struct {
 	repo repository
 }
@@ -9,6 +11,7 @@ func NewService(r repository) *service {
 }
 
 func (s *service) Create(c Category) error {
+	c.ID = uuid.NewString()
 	return s.repo.Save(c)
 }
 

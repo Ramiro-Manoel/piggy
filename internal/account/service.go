@@ -1,6 +1,10 @@
 package account
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/google/uuid"
+)
 
 type service struct {
 	repo     repository
@@ -32,6 +36,7 @@ func (s *service) Sync(institutionID string) error {
 	}
 
 	for _, a := range accounts {
+		a.ID = uuid.NewString()
 		err = s.repo.Save(a)
 		if err != nil {
 			return fmt.Errorf("save account %s: %w", a.ID, err)
