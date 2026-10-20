@@ -18,6 +18,7 @@ func NewAccountService(repo accountRepository, provider accountFinanceProvider) 
 }
 
 func (s *AccountService) Create(t AccountTransaction) error {
+	t.ID = uuid.NewString()
 	return s.repo.Save(t)
 }
 
@@ -36,10 +37,8 @@ func (s *AccountService) Sync(accountID string) error {
 	}
 
 	for _, t := range transactions {
-		t.ID = uuid.NewString()
-		err = s.repo.Save(t)
-		if err != nil {
-			return fmt.Errorf("save account transaction %s: %w", t.ID, err)
+		if err := s.Create(t); err != nil {
+			return fmt.Errorf("save account transaction %s: %w", t.Ref.ExternalID, err)
 		}
 	}
 	return nil

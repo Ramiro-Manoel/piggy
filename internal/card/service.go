@@ -15,6 +15,7 @@ func NewService(r repository, p financeProvider) *service {
 }
 
 func (s *service) Create(c Card) error {
+	c.ID = uuid.NewString()
 	return s.repo.Save(c)
 }
 
@@ -33,9 +34,7 @@ func (s *service) Sync(institutionID string) error {
 	}
 
 	for _, c := range cards {
-		c.ID = uuid.NewString()
-		err = s.repo.Save(c)
-		if err != nil {
+		if err := s.Create(c); err != nil {
 			return err
 		}
 	}

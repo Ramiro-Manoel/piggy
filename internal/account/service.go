@@ -18,6 +18,7 @@ func NewService(r repository, p financeProvider) *service {
 }
 
 func (s *service) Create(a Account) error {
+	a.ID = uuid.NewString()
 	return s.repo.Save(a)
 }
 
@@ -36,10 +37,8 @@ func (s *service) Sync(institutionID string) error {
 	}
 
 	for _, a := range accounts {
-		a.ID = uuid.NewString()
-		err = s.repo.Save(a)
-		if err != nil {
-			return fmt.Errorf("save account %s: %w", a.ID, err)
+		if err := s.Create(a); err != nil {
+			return fmt.Errorf("save account %s: %w", a.Ref.ExternalID, err)
 		}
 	}
 	return nil

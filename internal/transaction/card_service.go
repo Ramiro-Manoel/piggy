@@ -23,6 +23,7 @@ func NewCardService(repo cardRepository, provider cardFinanceProvider, card card
 }
 
 func (s *CardService) Create(t CardTransaction) error {
+	t.ID = uuid.NewString()
 	return s.repo.Save(t)
 }
 
@@ -48,12 +49,11 @@ func (s *CardService) Sync(cardID string) error {
 	for _, t := range transactions {
 		inv, err := s.invoice.FindOrCreate(c, t.Date)
 		if err != nil {
-			return fmt.Errorf("Sync: find or create invoice for transaction %s: %w", t.ID, err)
+			return fmt.Errorf("Sync: find or create invoice for transaction %s: %w", t.Ref.ExternalID, err)
 		}
 		t.InvoiceID = inv.ID
-		t.ID = uuid.NewString()
-		if err := s.repo.Save(t); err != nil {
-			return fmt.Errorf("Sync: save transaction %s: %w", t.ID, err)
+		if err := s.Create(t); err != nil {
+			return fmt.Errorf("Sync: save transaction %s: %w", t.Ref.ExternalID, err)
 		}
 	}
 	return nil
