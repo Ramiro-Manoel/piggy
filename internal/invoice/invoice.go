@@ -20,21 +20,27 @@ type Invoice struct {
 	CloseDate time.Time
 	PayDate   time.Time
 	Amount    int64
-	Status    Status
+	PaidAt    *time.Time // nil enquanto a fatura não foi paga
 }
 
 func New(cardID string, closeDate time.Time, dueDate time.Time) Invoice {
-	status := StatusOpen
-	if closeDate.Before(time.Now()) {
-		status = StatusClosed
-	}
-
 	return Invoice{
 		ID:        uuid.New().String(),
 		CardID:    cardID,
 		CloseDate: closeDate,
 		PayDate:   dueDate,
 		Amount:    0,
-		Status:    status,
 	}
+}
+
+// Status calcula a situação da fatura em relação a now. Não é guardado no
+// banco porque open/closed depende só da data e ficaria desatualizado.
+func (i Invoice) Status(now time.Time) Status {
+	if i.PaidAt != nil {
+		return StatusPaid
+	}
+	if now.Before(i.CloseDate) {
+		return StatusOpen
+	}
+	return StatusClosed
 }

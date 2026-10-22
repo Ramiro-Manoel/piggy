@@ -4,8 +4,7 @@ CREATE TABLE invoices (
     close_date   DATE NOT NULL,
     pay_date     DATE NOT NULL,
     amount       BIGINT NOT NULL DEFAULT 0,
-    status       TEXT NOT NULL DEFAULT 'open'
-        CHECK (status IN ('open', 'closed', 'paid'))
+    paid_at      DATE
 );
 
 CREATE UNIQUE INDEX invoices_card_close_date_unique

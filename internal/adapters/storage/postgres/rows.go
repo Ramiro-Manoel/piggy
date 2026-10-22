@@ -26,12 +26,12 @@ type cardRow struct {
 }
 
 type invoiceRow struct {
-	ID        string    `db:"id"`
-	CardID    string    `db:"card_id"`
-	CloseDate time.Time `db:"close_date"`
-	PayDate   time.Time `db:"pay_date"`
-	Amount    int64     `db:"amount"`
-	Status    string    `db:"status"`
+	ID        string     `db:"id"`
+	CardID    string     `db:"card_id"`
+	CloseDate time.Time  `db:"close_date"`
+	PayDate   time.Time  `db:"pay_date"`
+	Amount    int64      `db:"amount"`
+	PaidAt    *time.Time `db:"paid_at"`
 }
 
 type categoryRow struct {

@@ -14,7 +14,7 @@ func toInvoice(row invoiceRow) invoice.Invoice {
 		CloseDate: row.CloseDate,
 		PayDate:   row.PayDate,
 		Amount:    row.Amount,
-		Status:    invoice.Status(row.Status),
+		PaidAt:    row.PaidAt,
 	}
 }
 
@@ -28,9 +28,9 @@ func NewInvoiceRepository(db *pgx.Conn) *invoiceRepository {
 
 func (r *invoiceRepository) Save(i invoice.Invoice) error {
 	_, err := r.db.Exec(context.Background(), `
-	INSERT INTO invoices(id, card_id, close_date, pay_date, amount, status)
+	INSERT INTO invoices(id, card_id, close_date, pay_date, amount, paid_at)
 		VALUES ($1, $2, $3, $4, $5, $6)
-	`, i.ID, i.CardID, i.CloseDate, i.PayDate, i.Amount, i.Status)
+	`, i.ID, i.CardID, i.CloseDate, i.PayDate, i.Amount, i.PaidAt)
 
 	return err
 }
