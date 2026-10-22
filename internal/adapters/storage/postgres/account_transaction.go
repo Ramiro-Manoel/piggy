@@ -32,7 +32,7 @@ func (r *accountTransactionRepository) Save(t transaction.AccountTransaction) er
 	_, err := r.db.Exec(context.Background(), `
 		INSERT INTO account_transactions (id, external_id, source, description, amount, date, category_id, account_id)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-			ON CONFLICT (external_id, source) DO NOTHING
+			ON CONFLICT (external_id, source) WHERE external_id IS NOT NULL DO NOTHING
 		`, t.ID, t.Ref.ExternalID, t.Ref.Source, t.Description, t.Amount, t.Date, t.CategoryID, t.AccountID)
 
 	return err

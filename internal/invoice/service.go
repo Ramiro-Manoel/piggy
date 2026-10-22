@@ -18,7 +18,11 @@ func NewService(r repository) *service {
 }
 
 func (s service) FindOrCreate(c card.Card, transactionDate time.Time) (Invoice, error) {
-	closeDate := nextOccurrence(transactionDate, c.ClosingDay)
+	if c.ClosingDay == nil || c.DueDay == nil {
+		return Invoice{}, fmt.Errorf("FindOrCreate: card %s has no closing or due day", c.ID)
+	}
+
+	closeDate := nextOccurrence(transactionDate, *c.ClosingDay)
 
 	invoices, err := s.repo.List(Filter{
 		CloseDate: DateRange{Start: &closeDate, End: &closeDate},
@@ -31,7 +35,7 @@ func (s service) FindOrCreate(c card.Card, transactionDate time.Time) (Invoice, 
 		return invoices[0], nil
 	}
 
-	invoice := New(c.ID, closeDate, nextOccurrence(closeDate, c.DueDay))
+	invoice := New(c.ID, closeDate, nextOccurrence(closeDate, *c.DueDay))
 	if err := s.repo.Save(invoice); err != nil {
 		return Invoice{}, fmt.Errorf("FindOrCreate: %w", err)
 	}

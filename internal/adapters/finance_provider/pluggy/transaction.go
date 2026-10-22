@@ -23,7 +23,7 @@ func toAccountTransaction(pt pluggyTransaction) (transaction.AccountTransaction,
 		return transaction.AccountTransaction{}, err
 	}
 
-	t := transaction.AccountTransaction{AccountID: pt.AccountID}
+	t := transaction.AccountTransaction{}
 	t.Ref = external.Reference{
 		ExternalID: pt.ID,
 		Source:     source}

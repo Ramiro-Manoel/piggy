@@ -43,11 +43,11 @@ func main() {
 	accountSvc := account.NewService(accountRepo, financeProvider)
 	cardSvc := card.NewService(cardRepo, financeProvider)
 	invoiceSvc := invoice.NewService(invoiceRepo)
-	transactionSvc := transaction.NewAccountService(accountTransactionRepo, financeProvider)
+	accountTransactionSvc := transaction.NewAccountService(accountTransactionRepo, financeProvider, accountSvc)
 	cardTransactionSvc := transaction.NewCardService(cardTransactionRepo, financeProvider, cardSvc, invoiceSvc)
 	categorySvc := category.NewService(categoryRepo)
 
-	handler := handler.NewHandler(transactionSvc, cardTransactionSvc, categorySvc, accountSvc, cardSvc, os.Getenv("PLUGGY_INSTITUTION_ID"))
+	handler := handler.NewHandler(accountTransactionSvc, cardTransactionSvc, categorySvc, accountSvc, cardSvc, os.Getenv("PLUGGY_INSTITUTION_ID"))
 
 	mux := http.NewServeMux()
 	handler.RegisterRoutes(mux)

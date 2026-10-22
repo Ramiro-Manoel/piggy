@@ -40,7 +40,7 @@ func (r *cardTransactionRepository) Save(t transaction.CardTransaction) error {
 		) VALUES (
 		 	$1, $2, $3, $4, $5,
 			$6, $7, $8, $9, $10)
-			ON CONFLICT (external_id, source) DO NOTHING
+			ON CONFLICT (external_id, source) WHERE external_id IS NOT NULL DO NOTHING
 		`,
 		t.ID, t.Ref.ExternalID, t.Ref.Source, t.Description, t.Amount,
 		t.Date, t.CategoryID, t.InvoiceID, t.InstallmentNumber, t.TotalInstallments)

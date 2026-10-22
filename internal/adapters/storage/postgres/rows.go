@@ -20,8 +20,8 @@ type cardRow struct {
 	Brand          string  `db:"brand"`
 	CreditLimit    int64   `db:"credit_limit"`
 	AvailableLimit int64   `db:"available_limit"`
-	ClosingDay     int     `db:"closing_day"`
-	DueDay         int     `db:"due_day"`
+	ClosingDay     *int    `db:"closing_day"`
+	DueDay         *int    `db:"due_day"`
 	AccountID      *string `db:"account_id"`
 }
 

@@ -42,7 +42,7 @@ func (r *cardRepository) Save(c card.Card) error {
 	VALUES (
 		$1, $2, $3, $4, $5,
 		$6, $7, $8, $9, $10)
-	ON CONFLICT (external_id, source) DO NOTHING`,
+	ON CONFLICT (external_id, source) WHERE external_id IS NOT NULL DO NOTHING`,
 		c.ID, c.Ref.ExternalID, c.Ref.Source, c.Name, c.Brand,
 		c.CreditLimit, c.AvailableLimit, c.ClosingDay, c.DueDay, c.AccountID)
 

@@ -52,10 +52,15 @@ func toCards(pas []pluggyAccount) ([]card.Card, error) {
 	return cards, nil
 }
 
-func dayFromDate(date string) (int, error) {
+// dayFromDate devolve nil quando a data não veio (null no JSON vira "").
+func dayFromDate(date string) (*int, error) {
+	if date == "" {
+		return nil, nil
+	}
 	t, err := time.Parse(time.DateOnly, date)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return t.Day(), nil
+	day := t.Day()
+	return &day, nil
 }

@@ -9,12 +9,14 @@ import (
 type AccountService struct {
 	repo     accountRepository
 	provider accountFinanceProvider
+	account  accountReader
 }
 
-func NewAccountService(repo accountRepository, provider accountFinanceProvider) *AccountService {
+func NewAccountService(repo accountRepository, provider accountFinanceProvider, account accountReader) *AccountService {
 	return &AccountService{
 		repo:     repo,
-		provider: provider}
+		provider: provider,
+		account:  account}
 }
 
 func (s *AccountService) Create(t AccountTransaction) error {
@@ -31,12 +33,18 @@ func (s *AccountService) Read(id string) (AccountTransaction, error) {
 }
 
 func (s *AccountService) Sync(accountID string) error {
-	transactions, err := s.provider.FetchAccountTransactions(accountID)
+	account, err := s.account.Read(accountID)
+	if err != nil {
+		return fmt.Errorf("Sync: read card: %w", err)
+	}
+
+	transactions, err := s.provider.FetchAccountTransactions(account.Ref.ExternalID)
 	if err != nil {
 		return err
 	}
 
 	for _, t := range transactions {
+		t.AccountID = account.ID
 		if err := s.Create(t); err != nil {
 			return fmt.Errorf("save account transaction %s: %w", t.Ref.ExternalID, err)
 		}

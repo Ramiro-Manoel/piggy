@@ -34,7 +34,7 @@ func (r *accountRepository) Save(a account.Account) error {
 	_, err := r.db.Exec(context.Background(), `
 		INSERT INTO accounts (id, external_id, source, name, number, owner, balance)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
-		ON CONFLICT (external_id, source) DO NOTHING
+		ON CONFLICT (external_id, source) WHERE external_id IS NOT NULL DO NOTHING
 	`, a.ID, a.Ref.ExternalID, a.Ref.Source, a.Name, a.Number, a.Owner, a.Balance)
 
 	return err

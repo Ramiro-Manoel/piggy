@@ -3,12 +3,17 @@ package transaction
 import (
 	"time"
 
+	"github.com/Ramiro-Manoel/piggy/internal/account"
 	"github.com/Ramiro-Manoel/piggy/internal/card"
 	"github.com/Ramiro-Manoel/piggy/internal/invoice"
 )
 
 type cardReader interface {
 	Read(id string) (card.Card, error)
+}
+
+type accountReader interface {
+	Read(id string) (account.Account, error)
 }
 
 type invoiceService interface {

@@ -6,8 +6,8 @@ CREATE TABLE cards (
     brand           TEXT NOT NULL,
     credit_limit    BIGINT NOT NULL DEFAULT 0,
     available_limit BIGINT NOT NULL DEFAULT 0,
-	closing_day     INT NOT NULL,
-	due_day         INT NOT NULL,
+	closing_day     INT,
+	due_day         INT,
     account_id      TEXT
     );
 

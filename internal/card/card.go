@@ -9,7 +9,7 @@ type Card struct {
 	Brand          string
 	CreditLimit    int64
 	AvailableLimit int64
-	ClosingDay     int
-	DueDay         int
+	ClosingDay     *int // nil quando o banco não informa
+	DueDay         *int // nil quando o banco não informa
 	AccountID      *string
 }
