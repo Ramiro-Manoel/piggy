@@ -14,7 +14,7 @@ func NewAccountRepository() *accountRepository {
 	return &accountRepository{accounts: make([]account.Account, 0)}
 }
 
-func (r *accountRepository) Save(a account.Account) error {
+func (r *accountRepository) Create(a account.Account) error {
 	r.accounts = append(r.accounts, a)
 	return nil
 }

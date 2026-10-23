@@ -14,7 +14,7 @@ func NewCardRepository() *cardRepository {
 	return &cardRepository{cards: make([]card.Card, 0)}
 }
 
-func (r *cardRepository) Save(c card.Card) error {
+func (r *cardRepository) Create(c card.Card) error {
 	r.cards = append(r.cards, c)
 	return nil
 }

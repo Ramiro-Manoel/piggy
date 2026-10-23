@@ -14,7 +14,7 @@ func NewCategoryRepository() *categoryRepository {
 	return &categoryRepository{categories: make([]category.Category, 0)}
 }
 
-func (r *categoryRepository) Save(c category.Category) error {
+func (r *categoryRepository) Create(c category.Category) error {
 	r.categories = append(r.categories, c)
 	return nil
 }

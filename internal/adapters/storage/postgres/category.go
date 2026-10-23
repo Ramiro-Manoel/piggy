@@ -23,7 +23,7 @@ func NewCategoryRepository(db *pgx.Conn) *categoryRepository {
 	return &categoryRepository{db: db}
 }
 
-func (r *categoryRepository) Save(c category.Category) error {
+func (r *categoryRepository) Create(c category.Category) error {
 	_, err := r.db.Exec(context.Background(), `
 	INSERT INTO categories(id, name, parent_id)
 		VALUES ($1, $2, $3)

@@ -14,7 +14,7 @@ func NewCardTransactionRepository() *cardTransactionRepository {
 	return &cardTransactionRepository{transactions: make([]transaction.CardTransaction, 0)}
 }
 
-func (r *cardTransactionRepository) Save(t transaction.CardTransaction) error {
+func (r *cardTransactionRepository) Create(t transaction.CardTransaction) error {
 	r.transactions = append(r.transactions, t)
 	return nil
 }

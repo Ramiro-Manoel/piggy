@@ -32,7 +32,7 @@ func NewCardTransactionRepository(db *pgx.Conn) *cardTransactionRepository {
 	return &cardTransactionRepository{db: db}
 }
 
-func (r *cardTransactionRepository) Save(t transaction.CardTransaction) error {
+func (r *cardTransactionRepository) Create(t transaction.CardTransaction) error {
 	_, err := r.db.Exec(context.Background(), `
 		INSERT INTO card_transactions (
 			id, external_id, source, description, amount,

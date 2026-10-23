@@ -14,7 +14,7 @@ func NewAccountTransactionRepository() *accountTransactionRepository {
 	return &accountTransactionRepository{transactions: make([]transaction.AccountTransaction, 0)}
 }
 
-func (r *accountTransactionRepository) Save(t transaction.AccountTransaction) error {
+func (r *accountTransactionRepository) Create(t transaction.AccountTransaction) error {
 	r.transactions = append(r.transactions, t)
 	return nil
 }

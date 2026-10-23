@@ -33,7 +33,7 @@ func NewCardRepository(db *pgx.Conn) *cardRepository {
 	return &cardRepository{db: db}
 }
 
-func (r *cardRepository) Save(c card.Card) error {
+func (r *cardRepository) Create(c card.Card) error {
 	_, err := r.db.Exec(context.Background(), `
 	INSERT INTO cards(
 		id, external_id, source, name, brand,

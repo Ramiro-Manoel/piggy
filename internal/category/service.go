@@ -12,7 +12,7 @@ func NewService(r repository) *service {
 
 func (s *service) Create(c Category) error {
 	c.ID = uuid.NewString()
-	return s.repo.Save(c)
+	return s.repo.Create(c)
 }
 
 func (s *service) Read(id string) (Category, error) {

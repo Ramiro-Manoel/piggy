@@ -24,7 +24,7 @@ func NewCardService(repo cardRepository, provider cardFinanceProvider, card card
 
 func (s *CardService) Create(t CardTransaction) error {
 	t.ID = uuid.NewString()
-	return s.repo.Save(t)
+	return s.repo.Create(t)
 }
 
 func (s *CardService) List() []CardTransaction {

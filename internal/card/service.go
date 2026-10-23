@@ -16,7 +16,7 @@ func NewService(r repository, p financeProvider) *service {
 
 func (s *service) Create(c Card) error {
 	c.ID = uuid.NewString()
-	return s.repo.Save(c)
+	return s.repo.Create(c)
 }
 
 func (s *service) Read(id string) (Card, error) {

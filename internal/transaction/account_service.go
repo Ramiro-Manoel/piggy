@@ -21,7 +21,7 @@ func NewAccountService(repo accountRepository, provider accountFinanceProvider, 
 
 func (s *AccountService) Create(t AccountTransaction) error {
 	t.ID = uuid.NewString()
-	return s.repo.Save(t)
+	return s.repo.Create(t)
 }
 
 func (s *AccountService) List() []AccountTransaction {

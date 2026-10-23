@@ -28,7 +28,7 @@ func NewAccountTransactionRepository(db *pgx.Conn) *accountTransactionRepository
 	return &accountTransactionRepository{db: db}
 }
 
-func (r *accountTransactionRepository) Save(t transaction.AccountTransaction) error {
+func (r *accountTransactionRepository) Create(t transaction.AccountTransaction) error {
 	_, err := r.db.Exec(context.Background(), `
 		INSERT INTO account_transactions (id, external_id, source, description, amount, date, category_id, account_id)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
