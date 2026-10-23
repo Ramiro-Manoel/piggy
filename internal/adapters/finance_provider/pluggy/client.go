@@ -12,6 +12,7 @@ const (
 	authPath         = "/auth"
 	accountsPath     = "/accounts"
 	transactionsPath = "/v2/transactions"
+	billsPath        = "/bills"
 )
 const source = "pluggy"
 
@@ -134,4 +135,22 @@ func (c *client) fetchTransactions(accountID string) (transactionsResponse, erro
 	}
 
 	return transactionsResp, nil
+}
+
+func (c *client) fetchBills(accountID string) (billsResponse, error) {
+	url := baseURL + billsPath + "?accountId=" + accountID
+
+	resp, err := c.get(url)
+	if err != nil {
+		return billsResponse{}, err
+	}
+	defer resp.Body.Close()
+
+	var billsResp billsResponse
+	err = json.NewDecoder(resp.Body).Decode(&billsResp)
+	if err != nil {
+		return billsResponse{}, err
+	}
+
+	return billsResp, nil
 }

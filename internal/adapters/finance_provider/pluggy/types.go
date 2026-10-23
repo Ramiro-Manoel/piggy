@@ -57,3 +57,14 @@ type pluggyCreditData struct {
 	BalanceCloseDate string  `json:"balanceCloseDate"`
 	BalanceDueDate   string  `json:"balanceDueDate"`
 }
+
+type billsResponse struct {
+	Results []pluggyBill `json:"results"`
+}
+
+type pluggyBill struct {
+	ID              string  `json:"id"`
+	DueDate         string  `json:"dueDate"`
+	BillClosingDate string  `json:"billClosingDate"`
+	TotalAmount     float64 `json:"totalAmount"`
+}
