@@ -3,6 +3,7 @@ package invoice
 import (
 	"time"
 
+	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/google/uuid"
 )
 
@@ -16,11 +17,11 @@ const (
 
 type Invoice struct {
 	ID        string
+	Ref       external.Reference
 	CardID    string
 	CloseDate time.Time
 	PayDate   time.Time
 	Amount    int64
-	PaidAt    *time.Time // nil enquanto a fatura não foi paga
 }
 
 func New(cardID string, closeDate time.Time, dueDate time.Time) Invoice {
@@ -33,14 +34,12 @@ func New(cardID string, closeDate time.Time, dueDate time.Time) Invoice {
 	}
 }
 
-// Status calcula a situação da fatura em relação a now. Não é guardado no
-// banco porque open/closed depende só da data e ficaria desatualizado.
 func (i Invoice) Status(now time.Time) Status {
-	if i.PaidAt != nil {
-		return StatusPaid
-	}
 	if now.Before(i.CloseDate) {
 		return StatusOpen
 	}
-	return StatusClosed
+	if now.Before(i.PayDate.AddDate(0, 0, 1)) {
+		return StatusClosed
+	}
+	return StatusPaid
 }

@@ -3,19 +3,23 @@ package postgres
 import (
 	"context"
 
+	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/Ramiro-Manoel/piggy/internal/invoice"
 	"github.com/jackc/pgx/v5"
 )
 
 func toInvoice(row invoiceRow) invoice.Invoice {
-	return invoice.Invoice{
+	i := invoice.Invoice{
 		ID:        row.ID,
 		CardID:    row.CardID,
 		CloseDate: row.CloseDate,
 		PayDate:   row.PayDate,
 		Amount:    row.Amount,
-		PaidAt:    row.PaidAt,
 	}
+	if row.ExternalID != nil && row.Source != nil {
+		i.Ref = external.Reference{ExternalID: *row.ExternalID, Source: *row.Source}
+	}
+	return i
 }
 
 type invoiceRepository struct {
@@ -28,9 +32,10 @@ func NewInvoiceRepository(db *pgx.Conn) *invoiceRepository {
 
 func (r *invoiceRepository) Save(i invoice.Invoice) error {
 	_, err := r.db.Exec(context.Background(), `
-	INSERT INTO invoices(id, card_id, close_date, pay_date, amount, paid_at)
-		VALUES ($1, $2, $3, $4, $5, $6)
-	`, i.ID, i.CardID, i.CloseDate, i.PayDate, i.Amount, i.PaidAt)
+	INSERT INTO invoices(id, external_id, source, card_id, close_date, pay_date, amount)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`, i.ID, nullIfEmpty(i.Ref.ExternalID), nullIfEmpty(i.Ref.Source),
+		i.CardID, i.CloseDate, i.PayDate, i.Amount)
 
 	return err
 }
@@ -78,4 +83,11 @@ func (r *invoiceRepository) List(f invoice.Filter) ([]invoice.Invoice, error) {
 		invoices = append(invoices, toInvoice(row))
 	}
 	return invoices, nil
+}
+
+func nullIfEmpty(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
 }
