@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/Ramiro-Manoel/piggy/internal/invoice"
@@ -30,7 +31,7 @@ func NewInvoiceRepository(db *pgx.Conn) *invoiceRepository {
 	return &invoiceRepository{db: db}
 }
 
-func (r *invoiceRepository) Save(i invoice.Invoice) error {
+func (r *invoiceRepository) Create(i invoice.Invoice) error {
 	_, err := r.db.Exec(context.Background(), `
 	INSERT INTO invoices(id, external_id, source, card_id, close_date, pay_date, amount)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -38,6 +39,26 @@ func (r *invoiceRepository) Save(i invoice.Invoice) error {
 		i.CardID, i.CloseDate, i.PayDate, i.Amount)
 
 	return err
+}
+
+func (r *invoiceRepository) Update(i invoice.Invoice) error {
+	tag, err := r.db.Exec(context.Background(), `
+	UPDATE invoices SET
+		external_id = $2,
+		source      = $3,
+		close_date  = $4,
+		pay_date    = $5,
+		amount      = $6
+	WHERE id = $1
+	`, i.ID, nullIfEmpty(i.Ref.ExternalID), nullIfEmpty(i.Ref.Source),
+		i.CloseDate, i.PayDate, i.Amount)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return invoice.ErrNotFound
+	}
+	return nil
 }
 
 func (r *invoiceRepository) Read(id string) (invoice.Invoice, error) {
@@ -50,6 +71,25 @@ func (r *invoiceRepository) Read(id string) (invoice.Invoice, error) {
 	defer rows.Close()
 
 	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[invoiceRow])
+	if err != nil {
+		return invoice.Invoice{}, err
+	}
+	return toInvoice(row), nil
+}
+
+func (r *invoiceRepository) ReadByRef(ref external.Reference) (invoice.Invoice, error) {
+	rows, err := r.db.Query(context.Background(), `
+	SELECT * FROM invoices WHERE external_id = $1 AND source = $2
+	`, ref.ExternalID, ref.Source)
+	if err != nil {
+		return invoice.Invoice{}, err
+	}
+	defer rows.Close()
+
+	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[invoiceRow])
+	if errors.Is(err, pgx.ErrNoRows) {
+		return invoice.Invoice{}, invoice.ErrNotFound
+	}
 	if err != nil {
 		return invoice.Invoice{}, err
 	}

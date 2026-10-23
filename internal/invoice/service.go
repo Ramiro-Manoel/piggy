@@ -36,7 +36,7 @@ func (s service) FindOrCreate(c card.Card, transactionDate time.Time) (Invoice, 
 	}
 
 	invoice := New(c.ID, closeDate, nextOccurrence(closeDate, *c.DueDay))
-	if err := s.repo.Save(invoice); err != nil {
+	if err := s.repo.Create(invoice); err != nil {
 		return Invoice{}, fmt.Errorf("FindOrCreate: %w", err)
 	}
 	return invoice, nil

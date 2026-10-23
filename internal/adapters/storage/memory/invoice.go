@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/Ramiro-Manoel/piggy/internal/invoice"
 )
 
@@ -15,9 +16,28 @@ func NewInvoiceRepository() *invoiceRepository {
 	return &invoiceRepository{invoices: make([]invoice.Invoice, 0)}
 }
 
-func (r *invoiceRepository) Save(i invoice.Invoice) error {
+func (r *invoiceRepository) Create(i invoice.Invoice) error {
 	r.invoices = append(r.invoices, i)
 	return nil
+}
+
+func (r *invoiceRepository) Update(i invoice.Invoice) error {
+	for idx := range r.invoices {
+		if r.invoices[idx].ID == i.ID {
+			r.invoices[idx] = i
+			return nil
+		}
+	}
+	return invoice.ErrNotFound
+}
+
+func (r *invoiceRepository) ReadByRef(ref external.Reference) (invoice.Invoice, error) {
+	for _, i := range r.invoices {
+		if i.Ref == ref {
+			return i, nil
+		}
+	}
+	return invoice.Invoice{}, invoice.ErrNotFound
 }
 
 func (r *invoiceRepository) Read(id string) (invoice.Invoice, error) {
