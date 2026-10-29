@@ -24,7 +24,7 @@ func (s service) List(cardID string) ([]Invoice, error) {
 func (s service) FindOrCreate(c card.Card, month time.Time) (Invoice, error) {
 	invoices, err := s.repo.List(Filter{
 		CardIDs: []string{c.ID},
-		PayDate: monthRange(month),
+		DueDate: monthRange(month),
 	})
 	if err != nil {
 		return Invoice{}, fmt.Errorf("FindOrCreate: %w", err)

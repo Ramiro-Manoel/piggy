@@ -31,7 +31,7 @@ type invoiceRow struct {
 	Source     *string    `db:"source"`
 	CardID     string     `db:"card_id"`
 	CloseDate  *time.Time `db:"close_date"`
-	PayDate    time.Time  `db:"pay_date"`
+	DueDate    time.Time  `db:"due_date"`
 	Amount     int64      `db:"amount"`
 }
 

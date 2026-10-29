@@ -71,10 +71,10 @@ func matches(i invoice.Invoice, f invoice.Filter) bool {
 		return false
 	}
 
-	if f.PayDate.Start != nil && i.PayDate.Before(*f.PayDate.Start) {
+	if f.DueDate.Start != nil && i.DueDate.Before(*f.DueDate.Start) {
 		return false
 	}
-	if f.PayDate.End != nil && i.PayDate.After(*f.PayDate.End) {
+	if f.DueDate.End != nil && i.DueDate.After(*f.DueDate.End) {
 		return false
 	}
 

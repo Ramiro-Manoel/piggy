@@ -15,7 +15,7 @@ func toInvoice(row invoiceRow) invoice.Invoice {
 		ID:        row.ID,
 		CardID:    row.CardID,
 		CloseDate: row.CloseDate,
-		PayDate:   row.PayDate,
+		DueDate:   row.DueDate,
 		Amount:    row.Amount,
 	}
 	if row.ExternalID != nil && row.Source != nil {
@@ -34,10 +34,10 @@ func NewInvoiceRepository(db *pgxpool.Pool) *invoiceRepository {
 
 func (r *invoiceRepository) Create(i invoice.Invoice) error {
 	_, err := r.db.Exec(context.Background(), `
-	INSERT INTO invoices(id, external_id, source, card_id, close_date, pay_date, amount)
+	INSERT INTO invoices(id, external_id, source, card_id, close_date, due_date, amount)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`, i.ID, nullIfEmpty(i.Ref.ExternalID), nullIfEmpty(i.Ref.Source),
-		i.CardID, i.CloseDate, i.PayDate, i.Amount)
+		i.CardID, i.CloseDate, i.DueDate, i.Amount)
 
 	return err
 }
@@ -48,11 +48,11 @@ func (r *invoiceRepository) Update(i invoice.Invoice) error {
 		external_id = $2,
 		source      = $3,
 		close_date  = $4,
-		pay_date    = $5,
+		due_date    = $5,
 		amount      = $6
 	WHERE id = $1
 	`, i.ID, nullIfEmpty(i.Ref.ExternalID), nullIfEmpty(i.Ref.Source),
-		i.CloseDate, i.PayDate, i.Amount)
+		i.CloseDate, i.DueDate, i.Amount)
 	if err != nil {
 		return err
 	}
@@ -108,9 +108,9 @@ func (r *invoiceRepository) List(f invoice.Filter) ([]invoice.Invoice, error) {
 	WHERE 	($1::text[] IS NULL OR card_id = ANY($1))
 		AND ($2::date   IS NULL OR close_date >= $2)
 		AND ($3::date   IS NULL OR close_date <= $3)
-		AND ($4::date   IS NULL OR pay_date >= $4)
-		AND ($5::date   IS NULL OR pay_date <= $5)
-	`, cardIDs, f.CloseDate.Start, f.CloseDate.End, f.PayDate.Start, f.PayDate.End)
+		AND ($4::date   IS NULL OR due_date >= $4)
+		AND ($5::date   IS NULL OR due_date <= $5)
+	`, cardIDs, f.CloseDate.Start, f.CloseDate.End, f.DueDate.Start, f.DueDate.End)
 	if err != nil {
 		return nil, err
 	}
