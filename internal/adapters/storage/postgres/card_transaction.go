@@ -5,6 +5,7 @@ import (
 
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func toCardTransaction(row cardTransactionRow) transaction.CardTransaction {
@@ -25,10 +26,10 @@ func toCardTransaction(row cardTransactionRow) transaction.CardTransaction {
 }
 
 type cardTransactionRepository struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewCardTransactionRepository(db *pgx.Conn) *cardTransactionRepository {
+func NewCardTransactionRepository(db *pgxpool.Pool) *cardTransactionRepository {
 	return &cardTransactionRepository{db: db}
 }
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func toAccountTransaction(row accountTransactionRow) transaction.AccountTransaction {
@@ -21,10 +22,10 @@ func toAccountTransaction(row accountTransactionRow) transaction.AccountTransact
 }
 
 type accountTransactionRepository struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewAccountTransactionRepository(db *pgx.Conn) *accountTransactionRepository {
+func NewAccountTransactionRepository(db *pgxpool.Pool) *accountTransactionRepository {
 	return &accountTransactionRepository{db: db}
 }
 

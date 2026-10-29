@@ -14,25 +14,25 @@ import (
 	"github.com/Ramiro-Manoel/piggy/internal/handler"
 	"github.com/Ramiro-Manoel/piggy/internal/invoice"
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	godotenv.Load()
 
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close(context.Background())
+	defer pool.Close()
 
-	accountTransactionRepo := postgres.NewAccountTransactionRepository(conn)
-	cardRepo := postgres.NewCardRepository(conn)
-	invoiceRepo := postgres.NewInvoiceRepository(conn)
-	cardTransactionRepo := postgres.NewCardTransactionRepository(conn)
-	categoryRepo := postgres.NewCategoryRepository(conn)
-	accountRepo := postgres.NewAccountRepository(conn)
+	accountTransactionRepo := postgres.NewAccountTransactionRepository(pool)
+	cardRepo := postgres.NewCardRepository(pool)
+	invoiceRepo := postgres.NewInvoiceRepository(pool)
+	cardTransactionRepo := postgres.NewCardTransactionRepository(pool)
+	categoryRepo := postgres.NewCategoryRepository(pool)
+	accountRepo := postgres.NewAccountRepository(pool)
 
 	financeProvider := pluggy.NewClient(os.Getenv("PLUGGY_CLIENT_ID"), os.Getenv("PLUGGY_CLIENT_SECRET"))
 	err = financeProvider.Authenticate()

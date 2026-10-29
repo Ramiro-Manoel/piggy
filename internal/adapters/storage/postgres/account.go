@@ -6,6 +6,7 @@ import (
 	"github.com/Ramiro-Manoel/piggy/internal/account"
 	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func toAccount(row accountRow) account.Account {
@@ -23,10 +24,10 @@ func toAccount(row accountRow) account.Account {
 }
 
 type accountRepository struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewAccountRepository(db *pgx.Conn) *accountRepository {
+func NewAccountRepository(db *pgxpool.Pool) *accountRepository {
 	return &accountRepository{db: db}
 }
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Ramiro-Manoel/piggy/internal/category"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func toCategory(row categoryRow) category.Category {
@@ -16,10 +17,10 @@ func toCategory(row categoryRow) category.Category {
 }
 
 type categoryRepository struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewCategoryRepository(db *pgx.Conn) *categoryRepository {
+func NewCategoryRepository(db *pgxpool.Pool) *categoryRepository {
 	return &categoryRepository{db: db}
 }
 

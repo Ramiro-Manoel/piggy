@@ -6,6 +6,7 @@ import (
 	"github.com/Ramiro-Manoel/piggy/internal/card"
 	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func toCard(row cardRow) card.Card {
@@ -26,10 +27,10 @@ func toCard(row cardRow) card.Card {
 }
 
 type cardRepository struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewCardRepository(db *pgx.Conn) *cardRepository {
+func NewCardRepository(db *pgxpool.Pool) *cardRepository {
 	return &cardRepository{db: db}
 }
 

@@ -7,6 +7,7 @@ import (
 	"github.com/Ramiro-Manoel/piggy/internal/external"
 	"github.com/Ramiro-Manoel/piggy/internal/invoice"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func toInvoice(row invoiceRow) invoice.Invoice {
@@ -24,10 +25,10 @@ func toInvoice(row invoiceRow) invoice.Invoice {
 }
 
 type invoiceRepository struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewInvoiceRepository(db *pgx.Conn) *invoiceRepository {
+func NewInvoiceRepository(db *pgxpool.Pool) *invoiceRepository {
 	return &invoiceRepository{db: db}
 }
 
