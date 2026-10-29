@@ -63,7 +63,7 @@ func (r *categoryRepository) List() []category.Category {
 		return []category.Category{}
 	}
 
-	var categories []category.Category
+	categories := make([]category.Category, 0, len(categoryRows))
 	for _, row := range categoryRows {
 		categories = append(categories, toCategory(row))
 	}

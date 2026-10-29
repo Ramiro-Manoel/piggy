@@ -71,7 +71,7 @@ func (r *accountRepository) List() []account.Account {
 		return []account.Account{}
 	}
 
-	var accounts []account.Account
+	accounts := make([]account.Account, 0, len(accountRows))
 	for _, row := range accountRows {
 		accounts = append(accounts, toAccount(row))
 	}

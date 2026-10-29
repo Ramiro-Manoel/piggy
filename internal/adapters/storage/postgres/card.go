@@ -80,7 +80,7 @@ func (r *cardRepository) List() []card.Card {
 		return []card.Card{}
 	}
 
-	var cards []card.Card
+	cards := make([]card.Card, 0, len(cardRows))
 	for _, row := range cardRows {
 		cards = append(cards, toCard(row))
 	}
