@@ -8,6 +8,11 @@ const (
 	accountTypeCredit accountType = "CREDIT"
 )
 
+const (
+	transactionTypeCredit  = "CREDIT"
+	categoryTransferPrefix = "05"
+)
+
 type authRequest struct {
 	ClientId     string `json:"clientId"`
 	ClientSecret string `json:"clientSecret"`
@@ -27,6 +32,8 @@ type pluggyTransaction struct {
 	Amount             float64                  `json:"amount"`
 	Date               string                   `json:"date"`
 	AccountID          string                   `json:"accountId"`
+	Type               string                   `json:"type"`
+	CategoryID         string                   `json:"categoryId"`
 	CreditCardMetadata pluggyCreditCardMetadata `json:"creditCardMetadata"`
 }
 

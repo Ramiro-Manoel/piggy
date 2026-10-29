@@ -2,6 +2,7 @@ package pluggy
 
 import (
 	"math"
+	"strings"
 	"time"
 
 	"github.com/Ramiro-Manoel/piggy/internal/external"
@@ -87,6 +88,9 @@ func toCardTransaction(pt pluggyTransaction) (transaction.CardTransaction, error
 func toCardTransactions(pts []pluggyTransaction) ([]transaction.CardTransaction, error) {
 	var transactions []transaction.CardTransaction
 	for _, pt := range pts {
+		if isBillPayment(pt) {
+			continue
+		}
 		t, err := toCardTransaction(pt)
 		if err != nil {
 			return []transaction.CardTransaction{}, err
@@ -94,4 +98,8 @@ func toCardTransactions(pts []pluggyTransaction) ([]transaction.CardTransaction,
 		transactions = append(transactions, t)
 	}
 	return transactions, nil
+}
+
+func isBillPayment(pt pluggyTransaction) bool {
+	return pt.Type == transactionTypeCredit && strings.HasPrefix(pt.CategoryID, categoryTransferPrefix)
 }
