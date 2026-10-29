@@ -31,7 +31,7 @@ func toInvoice(bill pluggyBill) (invoice.Invoice, error) {
 		Ref: external.Reference{
 			ExternalID: bill.ID,
 			Source:     source},
-		CloseDate: closeDate,
+		CloseDate: &closeDate,
 		PayDate:   dueDate,
 		Amount:    int64(math.Round(bill.TotalAmount * 100)),
 	}, nil

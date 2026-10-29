@@ -64,10 +64,17 @@ func matches(i invoice.Invoice, f invoice.Filter) bool {
 		return false
 	}
 
-	if f.CloseDate.Start != nil && i.CloseDate.Before(*f.CloseDate.Start) {
+	if f.CloseDate.Start != nil && (i.CloseDate == nil || i.CloseDate.Before(*f.CloseDate.Start)) {
 		return false
 	}
-	if f.CloseDate.End != nil && i.CloseDate.After(*f.CloseDate.End) {
+	if f.CloseDate.End != nil && (i.CloseDate == nil || i.CloseDate.After(*f.CloseDate.End)) {
+		return false
+	}
+
+	if f.PayDate.Start != nil && i.PayDate.Before(*f.PayDate.Start) {
+		return false
+	}
+	if f.PayDate.End != nil && i.PayDate.After(*f.PayDate.End) {
 		return false
 	}
 

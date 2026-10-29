@@ -17,5 +17,5 @@ type accountReader interface {
 }
 
 type invoiceService interface {
-	FindOrCreate(c card.Card, transactionDate time.Time) (invoice.Invoice, error)
+	FindOrCreate(c card.Card, month time.Time) (invoice.Invoice, error)
 }

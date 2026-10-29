@@ -19,12 +19,12 @@ type Invoice struct {
 	ID        string
 	Ref       external.Reference
 	CardID    string
-	CloseDate time.Time
+	CloseDate *time.Time
 	PayDate   time.Time
 	Amount    int64
 }
 
-func New(cardID string, closeDate time.Time, dueDate time.Time) Invoice {
+func New(cardID string, closeDate *time.Time, dueDate time.Time) Invoice {
 	return Invoice{
 		ID:        uuid.New().String(),
 		CardID:    cardID,
@@ -35,11 +35,11 @@ func New(cardID string, closeDate time.Time, dueDate time.Time) Invoice {
 }
 
 func (i Invoice) Status(now time.Time) Status {
-	if now.Before(i.CloseDate) {
-		return StatusOpen
+	if !now.Before(i.PayDate.AddDate(0, 0, 1)) {
+		return StatusPaid
 	}
-	if now.Before(i.PayDate.AddDate(0, 0, 1)) {
+	if i.CloseDate != nil && !now.Before(*i.CloseDate) {
 		return StatusClosed
 	}
-	return StatusPaid
+	return StatusOpen
 }

@@ -108,7 +108,9 @@ func (r *invoiceRepository) List(f invoice.Filter) ([]invoice.Invoice, error) {
 	WHERE 	($1::text[] IS NULL OR card_id = ANY($1))
 		AND ($2::date   IS NULL OR close_date >= $2)
 		AND ($3::date   IS NULL OR close_date <= $3)
-	`, cardIDs, f.CloseDate.Start, f.CloseDate.End)
+		AND ($4::date   IS NULL OR pay_date >= $4)
+		AND ($5::date   IS NULL OR pay_date <= $5)
+	`, cardIDs, f.CloseDate.Start, f.CloseDate.End, f.PayDate.Start, f.PayDate.End)
 	if err != nil {
 		return nil, err
 	}

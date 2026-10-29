@@ -23,6 +23,7 @@ type AccountTransaction struct {
 type CardTransaction struct {
 	transaction
 	InvoiceID         string
+	InvoiceMonth      *time.Time
 	InstallmentNumber int
 	TotalInstallments int
 }

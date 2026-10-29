@@ -46,13 +46,11 @@ func (s *CardService) Sync(cardID string) error {
 		return fmt.Errorf("Sync: fetch transactions: %w", err)
 	}
 
-	c, err := s.card.Read(cardID)
-	if err != nil {
-		return fmt.Errorf("Sync: read card %s: %w", cardID, err)
-	}
-
 	for _, t := range transactions {
-		inv, err := s.invoice.FindOrCreate(c, t.Date)
+		if t.InvoiceMonth == nil {
+			continue
+		}
+		inv, err := s.invoice.FindOrCreate(card, *t.InvoiceMonth)
 		if err != nil {
 			return fmt.Errorf("Sync: find or create invoice for transaction %s: %w", t.Ref.ExternalID, err)
 		}

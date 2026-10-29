@@ -34,6 +34,7 @@ type pluggyCreditCardMetadata struct {
 	InstallmentNumber int    `json:"installmentNumber"`
 	TotalInstallments int    `json:"totalInstallments"`
 	CardNumber        string `json:"cardNumber"`
+	BillForecastDate  string `json:"billForecastDate"`
 }
 
 type accountsResponse struct {

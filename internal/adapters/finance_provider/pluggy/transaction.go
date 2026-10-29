@@ -73,6 +73,14 @@ func toCardTransaction(pt pluggyTransaction) (transaction.CardTransaction, error
 	t.Date = date
 	t.Amount = int64(math.Round(pt.Amount * 100))
 
+	if pt.CreditCardMetadata.BillForecastDate != "" {
+		month, err := time.Parse("2006-01", pt.CreditCardMetadata.BillForecastDate)
+		if err != nil {
+			return transaction.CardTransaction{}, err
+		}
+		t.InvoiceMonth = &month
+	}
+
 	return t, nil
 }
 
