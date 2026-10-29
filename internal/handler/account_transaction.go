@@ -1,9 +1,15 @@
 package handler
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/Ramiro-Manoel/piggy/internal/transaction"
+)
 
 func (h *Handler) listAccountTransactions(w http.ResponseWriter, r *http.Request) {
-	transactions, err := h.accountTransactionSvc.ListByAccount(r.PathValue("accountID"))
+	transactions, err := h.accountTransactionSvc.List(transaction.AccountFilter{
+		AccountIDs: []string{r.PathValue("accountID")},
+	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

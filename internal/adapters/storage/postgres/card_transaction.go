@@ -66,10 +66,17 @@ func (r *cardTransactionRepository) Read(id string) (transaction.CardTransaction
 	return toCardTransaction(row), nil
 }
 
-func (r *cardTransactionRepository) ListByInvoice(invoiceID string) ([]transaction.CardTransaction, error) {
+func (r *cardTransactionRepository) List(f transaction.CardFilter) ([]transaction.CardTransaction, error) {
+	var invoiceIDs []string
+	if len(f.InvoiceIDs) > 0 {
+		invoiceIDs = f.InvoiceIDs
+	}
+
 	rows, err := r.db.Query(context.Background(), `
-	SELECT * FROM card_transactions WHERE invoice_id = $1 ORDER BY date
-	`, invoiceID)
+	SELECT * FROM card_transactions
+	WHERE ($1::text[] IS NULL OR invoice_id = ANY($1))
+	ORDER BY date
+	`, invoiceIDs)
 	if err != nil {
 		return nil, err
 	}

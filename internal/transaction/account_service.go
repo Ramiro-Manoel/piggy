@@ -28,8 +28,8 @@ func (s *accountService) Read(id string) (AccountTransaction, error) {
 	return s.repo.Read(id)
 }
 
-func (s *accountService) ListByAccount(accountID string) ([]AccountTransaction, error) {
-	return s.repo.ListByAccount(accountID)
+func (s *accountService) List(f AccountFilter) ([]AccountTransaction, error) {
+	return s.repo.List(f)
 }
 
 func (s *accountService) Sync(accountID string) error {

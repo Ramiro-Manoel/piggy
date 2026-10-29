@@ -9,12 +9,12 @@ import (
 )
 
 type accountTransactionService interface {
-	ListByAccount(accountID string) ([]transaction.AccountTransaction, error)
+	List(transaction.AccountFilter) ([]transaction.AccountTransaction, error)
 	Sync(string) error
 }
 
 type cardTransactionService interface {
-	ListByInvoice(invoiceID string) ([]transaction.CardTransaction, error)
+	List(transaction.CardFilter) ([]transaction.CardTransaction, error)
 	Sync(string) error
 }
 
@@ -34,5 +34,5 @@ type cardService interface {
 }
 
 type invoiceService interface {
-	List(cardID string) ([]invoice.Invoice, error)
+	List(invoice.Filter) ([]invoice.Invoice, error)
 }

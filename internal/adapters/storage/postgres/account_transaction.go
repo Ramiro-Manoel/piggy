@@ -55,10 +55,17 @@ func (r *accountTransactionRepository) Read(id string) (transaction.AccountTrans
 
 	return toAccountTransaction(row), nil
 }
-func (r *accountTransactionRepository) ListByAccount(accountID string) ([]transaction.AccountTransaction, error) {
+func (r *accountTransactionRepository) List(f transaction.AccountFilter) ([]transaction.AccountTransaction, error) {
+	var accountIDs []string
+	if len(f.AccountIDs) > 0 {
+		accountIDs = f.AccountIDs
+	}
+
 	rows, err := r.db.Query(context.Background(), `
-	SELECT * FROM account_transactions WHERE account_id = $1 ORDER BY date
-	`, accountID)
+	SELECT * FROM account_transactions
+	WHERE ($1::text[] IS NULL OR account_id = ANY($1))
+	ORDER BY date
+	`, accountIDs)
 	if err != nil {
 		return nil, err
 	}

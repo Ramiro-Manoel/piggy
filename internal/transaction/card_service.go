@@ -31,8 +31,8 @@ func (s *cardService) Read(id string) (CardTransaction, error) {
 	return s.repo.Read(id)
 }
 
-func (s *cardService) ListByInvoice(invoiceID string) ([]CardTransaction, error) {
-	return s.repo.ListByInvoice(invoiceID)
+func (s *cardService) List(f CardFilter) ([]CardTransaction, error) {
+	return s.repo.List(f)
 }
 
 func (s *cardService) Sync(cardID string) error {

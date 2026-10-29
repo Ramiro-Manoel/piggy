@@ -2,6 +2,7 @@ package memory
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
@@ -28,12 +29,13 @@ func (r *accountTransactionRepository) Read(id string) (transaction.AccountTrans
 	return transaction.AccountTransaction{}, fmt.Errorf("transaction with id %s not found", id)
 }
 
-func (r *accountTransactionRepository) ListByAccount(accountID string) ([]transaction.AccountTransaction, error) {
+func (r *accountTransactionRepository) List(f transaction.AccountFilter) ([]transaction.AccountTransaction, error) {
 	transactions := []transaction.AccountTransaction{}
 	for _, t := range r.transactions {
-		if t.AccountID == accountID {
-			transactions = append(transactions, t)
+		if len(f.AccountIDs) > 0 && !slices.Contains(f.AccountIDs, t.AccountID) {
+			continue
 		}
+		transactions = append(transactions, t)
 	}
 	return transactions, nil
 }
