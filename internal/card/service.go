@@ -23,7 +23,7 @@ func (s *service) Read(id string) (Card, error) {
 	return s.repo.Read(id)
 }
 
-func (s *service) List() []Card {
+func (s *service) List() ([]Card, error) {
 	return s.repo.List()
 }
 

@@ -61,23 +61,23 @@ func (r *accountRepository) Read(id string) (account.Account, error) {
 	return toAccount(row), nil
 }
 
-func (r *accountRepository) List() []account.Account {
+func (r *accountRepository) List() ([]account.Account, error) {
 	rows, err := r.db.Query(context.Background(), `
 	SELECT * FROM accounts 
 	`)
 	if err != nil {
-		return []account.Account{}
+		return nil, err
 	}
 	defer rows.Close()
 
 	accountRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[accountRow])
 	if err != nil {
-		return []account.Account{}
+		return nil, err
 	}
 
 	accounts := make([]account.Account, 0, len(accountRows))
 	for _, row := range accountRows {
 		accounts = append(accounts, toAccount(row))
 	}
-	return accounts
+	return accounts, nil
 }

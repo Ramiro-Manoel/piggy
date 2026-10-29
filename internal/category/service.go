@@ -19,6 +19,6 @@ func (s *service) Read(id string) (Category, error) {
 	return s.repo.Read(id)
 }
 
-func (s *service) List() []Category {
+func (s *service) List() ([]Category, error) {
 	return s.repo.List()
 }

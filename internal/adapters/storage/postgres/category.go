@@ -53,23 +53,23 @@ func (r *categoryRepository) Read(id string) (category.Category, error) {
 	return toCategory(row), nil
 }
 
-func (r *categoryRepository) List() []category.Category {
+func (r *categoryRepository) List() ([]category.Category, error) {
 	rows, err := r.db.Query(context.Background(), `
 	SELECT * FROM categories
 	`)
 	if err != nil {
-		return []category.Category{}
+		return nil, err
 	}
 	defer rows.Close()
 
 	categoryRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[categoryRow])
 	if err != nil {
-		return []category.Category{}
+		return nil, err
 	}
 
 	categories := make([]category.Category, 0, len(categoryRows))
 	for _, row := range categoryRows {
 		categories = append(categories, toCategory(row))
 	}
-	return categories
+	return categories, nil
 }

@@ -3,7 +3,12 @@ package handler
 import "net/http"
 
 func (h *Handler) listAccounts(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, h.accountSvc.List())
+	accounts, err := h.accountSvc.List()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, accounts)
 }
 
 func (h *Handler) syncAccounts(w http.ResponseWriter, r *http.Request) {

@@ -26,7 +26,7 @@ func (s *service) Read(id string) (Account, error) {
 	return s.repo.Read(id)
 }
 
-func (s *service) List() []Account {
+func (s *service) List() ([]Account, error) {
 	return s.repo.List()
 }
 

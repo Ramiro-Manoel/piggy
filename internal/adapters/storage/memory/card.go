@@ -24,7 +24,7 @@ func (r *cardRepository) Read(id string) (card.Card, error) {
 	return card.Card{}, card.ErrNotFound
 }
 
-func (r *cardRepository) List() []card.Card {
+func (r *cardRepository) List() ([]card.Card, error) {
 	cards := append([]card.Card{}, r.cards...)
-	return cards
+	return cards, nil
 }

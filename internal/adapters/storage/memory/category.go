@@ -24,7 +24,7 @@ func (r *categoryRepository) Read(id string) (category.Category, error) {
 	return category.Category{}, category.ErrNotFound
 }
 
-func (r *categoryRepository) List() []category.Category {
+func (r *categoryRepository) List() ([]category.Category, error) {
 	categories := append([]category.Category{}, r.categories...)
-	return categories
+	return categories, nil
 }

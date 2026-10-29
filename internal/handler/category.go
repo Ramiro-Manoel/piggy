@@ -22,5 +22,10 @@ func (h *Handler) createCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) listCategories(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, h.categorySvc.List())
+	categories, err := h.categorySvc.List()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, categories)
 }

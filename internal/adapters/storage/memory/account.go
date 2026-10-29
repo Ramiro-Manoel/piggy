@@ -24,7 +24,7 @@ func (r *accountRepository) Read(id string) (account.Account, error) {
 	return account.Account{}, account.ErrNotFound
 }
 
-func (r *accountRepository) List() []account.Account {
+func (r *accountRepository) List() ([]account.Account, error) {
 	accounts := append([]account.Account{}, r.accounts...)
-	return accounts
+	return accounts, nil
 }

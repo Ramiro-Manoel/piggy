@@ -70,23 +70,23 @@ func (r *cardRepository) Read(id string) (card.Card, error) {
 	return toCard(row), nil
 }
 
-func (r *cardRepository) List() []card.Card {
+func (r *cardRepository) List() ([]card.Card, error) {
 	rows, err := r.db.Query(context.Background(), `
 	SELECT * FROM cards
 	`)
 	if err != nil {
-		return []card.Card{}
+		return nil, err
 	}
 	defer rows.Close()
 
 	cardRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[cardRow])
 	if err != nil {
-		return []card.Card{}
+		return nil, err
 	}
 
 	cards := make([]card.Card, 0, len(cardRows))
 	for _, row := range cardRows {
 		cards = append(cards, toCard(row))
 	}
-	return cards
+	return cards, nil
 }

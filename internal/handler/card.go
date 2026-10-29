@@ -3,7 +3,12 @@ package handler
 import "net/http"
 
 func (h *Handler) listCards(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, h.cardSvc.List())
+	cards, err := h.cardSvc.List()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, cards)
 }
 
 func (h *Handler) syncCards(w http.ResponseWriter, r *http.Request) {

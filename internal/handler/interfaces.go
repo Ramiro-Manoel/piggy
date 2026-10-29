@@ -20,16 +20,16 @@ type cardTransactionService interface {
 
 type categoryService interface {
 	Create(category.Category) error
-	List() []category.Category
+	List() ([]category.Category, error)
 }
 
 type accountService interface {
-	List() []account.Account
+	List() ([]account.Account, error)
 	Sync(string) error
 }
 
 type cardService interface {
-	List() []card.Card
+	List() ([]card.Card, error)
 	Sync(string) error
 }
 
