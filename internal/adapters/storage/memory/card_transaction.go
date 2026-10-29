@@ -32,3 +32,13 @@ func (r *cardTransactionRepository) List() []transaction.CardTransaction {
 	transactions := append([]transaction.CardTransaction{}, r.transactions...)
 	return transactions
 }
+
+func (r *cardTransactionRepository) ListByInvoice(invoiceID string) ([]transaction.CardTransaction, error) {
+	transactions := []transaction.CardTransaction{}
+	for _, t := range r.transactions {
+		if t.InvoiceID == invoiceID {
+			transactions = append(transactions, t)
+		}
+	}
+	return transactions, nil
+}

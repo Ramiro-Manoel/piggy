@@ -47,7 +47,7 @@ func main() {
 	cardTransactionSvc := transaction.NewCardService(cardTransactionRepo, financeProvider, cardSvc, invoiceSvc)
 	categorySvc := category.NewService(categoryRepo)
 
-	handler := handler.NewHandler(accountTransactionSvc, cardTransactionSvc, categorySvc, accountSvc, cardSvc, os.Getenv("PLUGGY_INSTITUTION_ID"))
+	handler := handler.NewHandler(accountTransactionSvc, cardTransactionSvc, categorySvc, accountSvc, cardSvc, invoiceSvc, os.Getenv("PLUGGY_INSTITUTION_ID"))
 
 	mux := http.NewServeMux()
 	handler.RegisterRoutes(mux)

@@ -11,6 +11,7 @@ type Handler struct {
 	categorySvc           categoryService
 	accountSvc            accountService
 	cardSvc               cardService
+	invoiceSvc            invoiceService
 	institutionID         string
 }
 
@@ -20,6 +21,7 @@ func NewHandler(
 	categorySvc categoryService,
 	accountSvc accountService,
 	cardSvc cardService,
+	invoiceSvc invoiceService,
 	institutionID string,
 ) *Handler {
 	return &Handler{
@@ -28,6 +30,7 @@ func NewHandler(
 		categorySvc:           categorySvc,
 		accountSvc:            accountSvc,
 		cardSvc:               cardSvc,
+		invoiceSvc:            invoiceSvc,
 		institutionID:         institutionID,
 	}
 }
@@ -48,6 +51,8 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /cards", h.createCard)
 	mux.HandleFunc("POST /cards/sync", h.syncCards)
 	mux.HandleFunc("POST /cards/{cardID}/transactions/sync", h.syncCardTransactions)
+	mux.HandleFunc("GET /cards/{cardID}/invoices", h.listCardInvoices)
+	mux.HandleFunc("GET /invoices/{invoiceID}/transactions", h.listInvoiceTransactions)
 }
 
 func decode[T any](w http.ResponseWriter, r *http.Request) (T, error) {

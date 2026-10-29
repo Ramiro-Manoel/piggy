@@ -35,6 +35,10 @@ func (s *CardService) Read(id string) (CardTransaction, error) {
 	return s.repo.Read(id)
 }
 
+func (s *CardService) ListByInvoice(invoiceID string) ([]CardTransaction, error) {
+	return s.repo.ListByInvoice(invoiceID)
+}
+
 func (s *CardService) Sync(cardID string) error {
 	card, err := s.card.Read(cardID)
 	if err != nil {

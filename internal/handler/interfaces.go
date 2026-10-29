@@ -4,6 +4,7 @@ import (
 	"github.com/Ramiro-Manoel/piggy/internal/account"
 	"github.com/Ramiro-Manoel/piggy/internal/card"
 	"github.com/Ramiro-Manoel/piggy/internal/category"
+	"github.com/Ramiro-Manoel/piggy/internal/invoice"
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 )
 
@@ -18,6 +19,7 @@ type cardTransactionService interface {
 	Create(transaction.CardTransaction) error
 	Read(string) (transaction.CardTransaction, error)
 	List() []transaction.CardTransaction
+	ListByInvoice(invoiceID string) ([]transaction.CardTransaction, error)
 	Sync(string) error
 }
 
@@ -39,4 +41,8 @@ type cardService interface {
 	Read(string) (card.Card, error)
 	List() []card.Card
 	Sync(string) error
+}
+
+type invoiceService interface {
+	List(cardID string) ([]invoice.Invoice, error)
 }

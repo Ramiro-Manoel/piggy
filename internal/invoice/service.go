@@ -17,6 +17,10 @@ func NewService(r repository) *service {
 	}
 }
 
+func (s service) List(cardID string) ([]Invoice, error) {
+	return s.repo.List(Filter{CardIDs: []string{cardID}})
+}
+
 func (s service) FindOrCreate(c card.Card, month time.Time) (Invoice, error) {
 	invoices, err := s.repo.List(Filter{
 		CardIDs: []string{c.ID},

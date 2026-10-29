@@ -85,3 +85,24 @@ func (r *cardTransactionRepository) List() []transaction.CardTransaction {
 	}
 	return transactions
 }
+
+func (r *cardTransactionRepository) ListByInvoice(invoiceID string) ([]transaction.CardTransaction, error) {
+	rows, err := r.db.Query(context.Background(), `
+	SELECT * FROM card_transactions WHERE invoice_id = $1 ORDER BY date
+	`, invoiceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	transactionRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[cardTransactionRow])
+	if err != nil {
+		return nil, err
+	}
+
+	transactions := make([]transaction.CardTransaction, 0, len(transactionRows))
+	for _, row := range transactionRows {
+		transactions = append(transactions, toCardTransaction(row))
+	}
+	return transactions, nil
+}
