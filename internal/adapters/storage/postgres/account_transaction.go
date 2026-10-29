@@ -55,23 +55,23 @@ func (r *accountTransactionRepository) Read(id string) (transaction.AccountTrans
 
 	return toAccountTransaction(row), nil
 }
-func (r *accountTransactionRepository) List() []transaction.AccountTransaction {
+func (r *accountTransactionRepository) ListByAccount(accountID string) ([]transaction.AccountTransaction, error) {
 	rows, err := r.db.Query(context.Background(), `
-	SELECT * FROM account_transactions
-	`)
+	SELECT * FROM account_transactions WHERE account_id = $1 ORDER BY date
+	`, accountID)
 	if err != nil {
-		return []transaction.AccountTransaction{}
+		return nil, err
 	}
 	defer rows.Close()
 
 	transactionRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[accountTransactionRow])
 	if err != nil {
-		return []transaction.AccountTransaction{}
+		return nil, err
 	}
 
-	var transactions []transaction.AccountTransaction
+	transactions := make([]transaction.AccountTransaction, 0, len(transactionRows))
 	for _, row := range transactionRows {
 		transactions = append(transactions, toAccountTransaction(row))
 	}
-	return transactions
+	return transactions, nil
 }

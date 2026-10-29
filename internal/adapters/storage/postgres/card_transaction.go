@@ -66,26 +66,6 @@ func (r *cardTransactionRepository) Read(id string) (transaction.CardTransaction
 	return toCardTransaction(row), nil
 }
 
-func (r *cardTransactionRepository) List() []transaction.CardTransaction {
-	rows, err := r.db.Query(context.Background(), `
-	SELECT * FROM card_transactions
-	`)
-	if err != nil {
-		return []transaction.CardTransaction{}
-	}
-	defer rows.Close()
-
-	transactionRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[cardTransactionRow])
-	if err != nil {
-		return []transaction.CardTransaction{}
-	}
-	var transactions []transaction.CardTransaction
-	for _, row := range transactionRows {
-		transactions = append(transactions, toCardTransaction(row))
-	}
-	return transactions
-}
-
 func (r *cardTransactionRepository) ListByInvoice(invoiceID string) ([]transaction.CardTransaction, error) {
 	rows, err := r.db.Query(context.Background(), `
 	SELECT * FROM card_transactions WHERE invoice_id = $1 ORDER BY date

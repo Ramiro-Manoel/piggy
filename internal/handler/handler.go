@@ -37,21 +37,18 @@ func NewHandler(
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /accounts", h.listAccounts)
-	mux.HandleFunc("POST /accounts", h.createAccount)
 	mux.HandleFunc("POST /accounts/sync", h.syncAccounts)
+	mux.HandleFunc("GET /accounts/{accountID}/transactions", h.listAccountTransactions)
 	mux.HandleFunc("POST /accounts/{accountID}/transactions/sync", h.syncAccountTransactions)
-
-	mux.HandleFunc("GET /transactions", h.listAccountTransactions)
-	mux.HandleFunc("POST /transactions", h.createAccountTransaction)
 
 	mux.HandleFunc("GET /categories", h.listCategories)
 	mux.HandleFunc("POST /categories", h.createCategory)
 
 	mux.HandleFunc("GET /cards", h.listCards)
-	mux.HandleFunc("POST /cards", h.createCard)
 	mux.HandleFunc("POST /cards/sync", h.syncCards)
 	mux.HandleFunc("POST /cards/{cardID}/transactions/sync", h.syncCardTransactions)
 	mux.HandleFunc("GET /cards/{cardID}/invoices", h.listCardInvoices)
+
 	mux.HandleFunc("GET /invoices/{invoiceID}/transactions", h.listInvoiceTransactions)
 }
 

@@ -27,10 +27,6 @@ func (s *CardService) Create(t CardTransaction) error {
 	return s.repo.Create(t)
 }
 
-func (s *CardService) List() []CardTransaction {
-	return s.repo.List()
-}
-
 func (s *CardService) Read(id string) (CardTransaction, error) {
 	return s.repo.Read(id)
 }

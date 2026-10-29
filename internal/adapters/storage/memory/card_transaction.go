@@ -28,11 +28,6 @@ func (r *cardTransactionRepository) Read(id string) (transaction.CardTransaction
 	return transaction.CardTransaction{}, fmt.Errorf("transaction with id %s not found", id)
 }
 
-func (r *cardTransactionRepository) List() []transaction.CardTransaction {
-	transactions := append([]transaction.CardTransaction{}, r.transactions...)
-	return transactions
-}
-
 func (r *cardTransactionRepository) ListByInvoice(invoiceID string) ([]transaction.CardTransaction, error) {
 	transactions := []transaction.CardTransaction{}
 	for _, t := range r.transactions {

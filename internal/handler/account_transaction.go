@@ -1,28 +1,14 @@
 package handler
 
-import (
-	"net/http"
+import "net/http"
 
-	"github.com/Ramiro-Manoel/piggy/internal/transaction"
-)
-
-func (h *Handler) createAccountTransaction(w http.ResponseWriter, r *http.Request) {
-	t, err := decode[transaction.AccountTransaction](w, r)
-	if err != nil {
-		return
-	}
-
-	err = h.accountTransactionSvc.Create(t)
+func (h *Handler) listAccountTransactions(w http.ResponseWriter, r *http.Request) {
+	transactions, err := h.accountTransactionSvc.ListByAccount(r.PathValue("accountID"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusCreated)
-}
-
-func (h *Handler) listAccountTransactions(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, h.accountTransactionSvc.List())
+	writeJSON(w, transactions)
 }
 
 func (h *Handler) syncAccountTransactions(w http.ResponseWriter, r *http.Request) {

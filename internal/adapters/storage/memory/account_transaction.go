@@ -28,7 +28,12 @@ func (r *accountTransactionRepository) Read(id string) (transaction.AccountTrans
 	return transaction.AccountTransaction{}, fmt.Errorf("transaction with id %s not found", id)
 }
 
-func (r *accountTransactionRepository) List() []transaction.AccountTransaction {
-	transactions := append([]transaction.AccountTransaction{}, r.transactions...)
-	return transactions
+func (r *accountTransactionRepository) ListByAccount(accountID string) ([]transaction.AccountTransaction, error) {
+	transactions := []transaction.AccountTransaction{}
+	for _, t := range r.transactions {
+		if t.AccountID == accountID {
+			transactions = append(transactions, t)
+		}
+	}
+	return transactions, nil
 }

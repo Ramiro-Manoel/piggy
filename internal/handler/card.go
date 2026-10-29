@@ -1,24 +1,6 @@
 package handler
 
-import (
-	"net/http"
-
-	"github.com/Ramiro-Manoel/piggy/internal/card"
-)
-
-func (h *Handler) createCard(w http.ResponseWriter, r *http.Request) {
-	c, err := decode[card.Card](w, r)
-	if err != nil {
-		return
-	}
-
-	if err := h.cardSvc.Create(c); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-}
+import "net/http"
 
 func (h *Handler) listCards(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, h.cardSvc.List())

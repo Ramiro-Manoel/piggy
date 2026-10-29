@@ -24,12 +24,12 @@ func (s *AccountService) Create(t AccountTransaction) error {
 	return s.repo.Create(t)
 }
 
-func (s *AccountService) List() []AccountTransaction {
-	return s.repo.List()
-}
-
 func (s *AccountService) Read(id string) (AccountTransaction, error) {
 	return s.repo.Read(id)
+}
+
+func (s *AccountService) ListByAccount(accountID string) ([]AccountTransaction, error) {
+	return s.repo.ListByAccount(accountID)
 }
 
 func (s *AccountService) Sync(accountID string) error {
