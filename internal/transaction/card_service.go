@@ -6,15 +6,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type CardService struct {
+type cardService struct {
 	repo     cardRepository
 	provider cardFinanceProvider
 	card     cardReader
 	invoice  invoiceService
 }
 
-func NewCardService(repo cardRepository, provider cardFinanceProvider, card cardReader, invoice invoiceService) *CardService {
-	return &CardService{
+func NewCardService(repo cardRepository, provider cardFinanceProvider, card cardReader, invoice invoiceService) *cardService {
+	return &cardService{
 		repo:     repo,
 		provider: provider,
 		card:     card,
@@ -22,20 +22,20 @@ func NewCardService(repo cardRepository, provider cardFinanceProvider, card card
 	}
 }
 
-func (s *CardService) Create(t CardTransaction) error {
+func (s *cardService) Create(t CardTransaction) error {
 	t.ID = uuid.NewString()
 	return s.repo.Create(t)
 }
 
-func (s *CardService) Read(id string) (CardTransaction, error) {
+func (s *cardService) Read(id string) (CardTransaction, error) {
 	return s.repo.Read(id)
 }
 
-func (s *CardService) ListByInvoice(invoiceID string) ([]CardTransaction, error) {
+func (s *cardService) ListByInvoice(invoiceID string) ([]CardTransaction, error) {
 	return s.repo.ListByInvoice(invoiceID)
 }
 
-func (s *CardService) Sync(cardID string) error {
+func (s *cardService) Sync(cardID string) error {
 	card, err := s.card.Read(cardID)
 	if err != nil {
 		return fmt.Errorf("Sync: read card: %w", err)

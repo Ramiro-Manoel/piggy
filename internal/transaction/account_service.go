@@ -6,36 +6,36 @@ import (
 	"github.com/google/uuid"
 )
 
-type AccountService struct {
+type accountService struct {
 	repo     accountRepository
 	provider accountFinanceProvider
 	account  accountReader
 }
 
-func NewAccountService(repo accountRepository, provider accountFinanceProvider, account accountReader) *AccountService {
-	return &AccountService{
+func NewAccountService(repo accountRepository, provider accountFinanceProvider, account accountReader) *accountService {
+	return &accountService{
 		repo:     repo,
 		provider: provider,
 		account:  account}
 }
 
-func (s *AccountService) Create(t AccountTransaction) error {
+func (s *accountService) Create(t AccountTransaction) error {
 	t.ID = uuid.NewString()
 	return s.repo.Create(t)
 }
 
-func (s *AccountService) Read(id string) (AccountTransaction, error) {
+func (s *accountService) Read(id string) (AccountTransaction, error) {
 	return s.repo.Read(id)
 }
 
-func (s *AccountService) ListByAccount(accountID string) ([]AccountTransaction, error) {
+func (s *accountService) ListByAccount(accountID string) ([]AccountTransaction, error) {
 	return s.repo.ListByAccount(accountID)
 }
 
-func (s *AccountService) Sync(accountID string) error {
+func (s *accountService) Sync(accountID string) error {
 	account, err := s.account.Read(accountID)
 	if err != nil {
-		return fmt.Errorf("Sync: read card: %w", err)
+		return fmt.Errorf("Sync: read account: %w", err)
 	}
 
 	transactions, err := s.provider.FetchAccountTransactions(account.Ref.ExternalID)
