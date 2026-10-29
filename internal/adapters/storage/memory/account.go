@@ -1,10 +1,6 @@
 package memory
 
-import (
-	"fmt"
-
-	"github.com/Ramiro-Manoel/piggy/internal/account"
-)
+import "github.com/Ramiro-Manoel/piggy/internal/account"
 
 type accountRepository struct {
 	accounts []account.Account
@@ -25,7 +21,7 @@ func (r *accountRepository) Read(id string) (account.Account, error) {
 			return r.accounts[i], nil
 		}
 	}
-	return account.Account{}, fmt.Errorf("account with id %s not found", id)
+	return account.Account{}, account.ErrNotFound
 }
 
 func (r *accountRepository) List() []account.Account {

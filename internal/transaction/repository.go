@@ -1,5 +1,9 @@
 package transaction
 
+import "errors"
+
+var ErrNotFound = errors.New("transaction not found")
+
 type accountRepository interface {
 	Create(AccountTransaction) error
 	Read(id string) (AccountTransaction, error)

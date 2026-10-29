@@ -1,10 +1,6 @@
 package memory
 
-import (
-	"fmt"
-
-	"github.com/Ramiro-Manoel/piggy/internal/card"
-)
+import "github.com/Ramiro-Manoel/piggy/internal/card"
 
 type cardRepository struct {
 	cards []card.Card
@@ -25,7 +21,7 @@ func (r *cardRepository) Read(id string) (card.Card, error) {
 			return r.cards[i], nil
 		}
 	}
-	return card.Card{}, fmt.Errorf("card with id %s not found", id)
+	return card.Card{}, card.ErrNotFound
 }
 
 func (r *cardRepository) List() []card.Card {

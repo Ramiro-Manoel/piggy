@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
 	"github.com/jackc/pgx/v5"
@@ -59,6 +60,9 @@ func (r *cardTransactionRepository) Read(id string) (transaction.CardTransaction
 	defer rows.Close()
 
 	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[cardTransactionRow])
+	if errors.Is(err, pgx.ErrNoRows) {
+		return transaction.CardTransaction{}, transaction.ErrNotFound
+	}
 	if err != nil {
 		return transaction.CardTransaction{}, err
 	}

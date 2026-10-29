@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"fmt"
 	"slices"
 
 	"github.com/Ramiro-Manoel/piggy/internal/external"
@@ -46,7 +45,7 @@ func (r *invoiceRepository) Read(id string) (invoice.Invoice, error) {
 			return r.invoices[i], nil
 		}
 	}
-	return invoice.Invoice{}, fmt.Errorf("category with id %s not found", id)
+	return invoice.Invoice{}, invoice.ErrNotFound
 }
 
 func (r *invoiceRepository) List(f invoice.Filter) ([]invoice.Invoice, error) {

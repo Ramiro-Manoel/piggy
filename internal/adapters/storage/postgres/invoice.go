@@ -72,6 +72,9 @@ func (r *invoiceRepository) Read(id string) (invoice.Invoice, error) {
 	defer rows.Close()
 
 	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[invoiceRow])
+	if errors.Is(err, pgx.ErrNoRows) {
+		return invoice.Invoice{}, invoice.ErrNotFound
+	}
 	if err != nil {
 		return invoice.Invoice{}, err
 	}

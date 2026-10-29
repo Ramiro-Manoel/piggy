@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"fmt"
 	"slices"
 
 	"github.com/Ramiro-Manoel/piggy/internal/transaction"
@@ -26,7 +25,7 @@ func (r *accountTransactionRepository) Read(id string) (transaction.AccountTrans
 			return r.transactions[i], nil
 		}
 	}
-	return transaction.AccountTransaction{}, fmt.Errorf("transaction with id %s not found", id)
+	return transaction.AccountTransaction{}, transaction.ErrNotFound
 }
 
 func (r *accountTransactionRepository) List(f transaction.AccountFilter) ([]transaction.AccountTransaction, error) {

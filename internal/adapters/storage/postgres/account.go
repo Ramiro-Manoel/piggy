@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Ramiro-Manoel/piggy/internal/account"
 	"github.com/Ramiro-Manoel/piggy/internal/external"
@@ -51,6 +52,9 @@ func (r *accountRepository) Read(id string) (account.Account, error) {
 	defer rows.Close()
 
 	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[accountRow])
+	if errors.Is(err, pgx.ErrNoRows) {
+		return account.Account{}, account.ErrNotFound
+	}
 	if err != nil {
 		return account.Account{}, err
 	}

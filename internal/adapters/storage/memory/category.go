@@ -1,10 +1,6 @@
 package memory
 
-import (
-	"fmt"
-
-	"github.com/Ramiro-Manoel/piggy/internal/category"
-)
+import "github.com/Ramiro-Manoel/piggy/internal/category"
 
 type categoryRepository struct {
 	categories []category.Category
@@ -25,7 +21,7 @@ func (r *categoryRepository) Read(id string) (category.Category, error) {
 			return r.categories[i], nil
 		}
 	}
-	return category.Category{}, fmt.Errorf("category with id %s not found", id)
+	return category.Category{}, category.ErrNotFound
 }
 
 func (r *categoryRepository) List() []category.Category {

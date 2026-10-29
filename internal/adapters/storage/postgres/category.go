@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Ramiro-Manoel/piggy/internal/category"
 	"github.com/jackc/pgx/v5"
@@ -43,6 +44,9 @@ func (r *categoryRepository) Read(id string) (category.Category, error) {
 	defer rows.Close()
 
 	row, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[categoryRow])
+	if errors.Is(err, pgx.ErrNoRows) {
+		return category.Category{}, category.ErrNotFound
+	}
 	if err != nil {
 		return category.Category{}, err
 	}
