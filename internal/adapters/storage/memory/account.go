@@ -10,7 +10,14 @@ func NewAccountRepository() *accountRepository {
 	return &accountRepository{accounts: make([]account.Account, 0)}
 }
 
-func (r *accountRepository) Create(a account.Account) error {
+func (r *accountRepository) Save(a account.Account) error {
+	for i := range r.accounts {
+		if r.accounts[i].Ref == a.Ref {
+			a.ID = r.accounts[i].ID
+			r.accounts[i] = a
+			return nil
+		}
+	}
 	r.accounts = append(r.accounts, a)
 	return nil
 }

@@ -19,7 +19,7 @@ func NewService(r repository, p financeProvider) *service {
 
 func (s *service) Create(a Account) error {
 	a.ID = uuid.NewString()
-	return s.repo.Create(a)
+	return s.repo.Save(a)
 }
 
 func (s *service) Read(id string) (Account, error) {
