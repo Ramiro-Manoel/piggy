@@ -35,7 +35,7 @@ func NewCardRepository(db *pgxpool.Pool) *cardRepository {
 	return &cardRepository{db: db}
 }
 
-func (r *cardRepository) Create(c card.Card) error {
+func (r *cardRepository) Save(c card.Card) error {
 	_, err := r.db.Exec(context.Background(), `
 	INSERT INTO cards(
 		id, external_id, source, name, brand,
@@ -44,7 +44,15 @@ func (r *cardRepository) Create(c card.Card) error {
 	VALUES (
 		$1, $2, $3, $4, $5,
 		$6, $7, $8, $9, $10)
-	ON CONFLICT (external_id, source) WHERE external_id IS NOT NULL DO NOTHING`,
+	ON CONFLICT (external_id, source) WHERE external_id IS NOT NULL DO UPDATE SET
+		name            = EXCLUDED.name,
+		brand           = EXCLUDED.brand,
+		credit_limit    = EXCLUDED.credit_limit,
+		available_limit = EXCLUDED.available_limit,
+		closing_day     = COALESCE(EXCLUDED.closing_day, cards.closing_day),
+		due_day         = COALESCE(EXCLUDED.due_day, cards.due_day),
+		account_id      = COALESCE(EXCLUDED.account_id, cards.account_id)
+	`,
 		c.ID, c.Ref.ExternalID, c.Ref.Source, c.Name, c.Brand,
 		c.CreditLimit, c.AvailableLimit, c.ClosingDay, c.DueDay, c.AccountID)
 
